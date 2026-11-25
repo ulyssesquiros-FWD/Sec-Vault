@@ -1,7 +1,7 @@
 # Fase 0 — Deep Research: Despliegue de Node.js y MySQL en Producción
 
 **Proyecto:** SecureVault (Sistema Full Stack seguro con Node.js, Express.js, React, MySQL, bcrypt y AES-256-GCM)  
-**Autor:** Josué (Proyecto Individual)  
+**Autor:** Ulysses Quiros (Proyecto Individual)  
 **Fecha de investigación y verificación:** 25 de noviembre de 2026  
 
 ---

@@ -1,6 +1,6 @@
 # Guion de Demostración y Presentación de Resultados — SecureVault
 
-**Estudiante / Expositor único:** Josué  
+**Estudiante / Expositor único:** Ulysses Quiros  
 **Modalidad:** Proyecto individual  
 
 ---

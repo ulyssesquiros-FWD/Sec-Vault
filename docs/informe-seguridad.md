@@ -1,6 +1,7 @@
 # Informe Técnico de Seguridad y Cumplimiento OWASP Top 10:2025 — SecureVault
 
-**Autor:** Josué (Proyecto Individual)  
+**Autor:** Ulysses Quiros (Proyecto Individual)  
+**Repositorio:** https://github.com/ulyssesquiros-FWD/Sec-Vault  
 **Fecha de auditoría y actualización:** 25 de noviembre de 2026  
 
 ---
@@ -9,14 +10,14 @@
 
 | Requisito | Funcionalidad Oficial | Estado | Verificación Realizada | Observaciones |
 |---|---|---|---|---|
-| **RF-01** | Registro de usuario | **Implementado y verificado (HTTP)** | Suite HTTP (`httpSecurity.test.js`) y suite `mysql.integration.test.js` preparada para CI | Validación Zod `.strict()`, correo normalizado + `UNIQUE`, rol forzado `user`, `bcrypt >= 12`. |
-| **RF-02** | Inicio y cierre de sesión | **Implementado y verificado (HTTP)** | Regeneración de sesión, cookies `HttpOnly`/`SameSite`, expiración `401`, CSRF `403`, logout | Persistencia real `express-mysql-session` verificable en MySQL / CI. |
-| **RF-03** | Roles: usuario y administrador | **Implementado y verificado (HTTP)** | Bloqueo `403` a `user` en `/api/admin/*`, prevención de auto-cambio de rol, `session_version++` | Admin no tiene acceso automático a notas privadas ajenas. |
-| **RF-04** | CRUD de notas privadas | **Implementado y verificado (HTTP)** | Crear, leer, editar, eliminar, límite 50 notas y bloqueo IDOR `403` entre usuarios | Contenido cifrado con AES-256-GCM + AAD `note:<id>:owner:<owner_id>`. |
-| **RF-05** | Dato sensible del perfil cifrado y enmascarado | **Implementado y verificado (HTTP)** | Teléfono almacenado cifrado (`v1.`), devuelto como `***-***-3456` y revelado solo tras contraseña | Re-autenticación obligatoria para revelar teléfono completo. |
-| **RF-06** | Recuperación de contraseña | **Implementado y verificado (HTTP)** | Token `randomBytes(32)`, hash SHA-256 en MySQL (`UTC_TIMESTAMP()`), uso único y expiración | Requiere credenciales SMTP reales en producción para envío saliente. |
-| **RF-07** | Panel administrativo y bitácora | **Implementado y verificado (HTTP + UI)** | Estadísticas, gestión de roles, filtros de bitácora en `security_events` y alertas | Logs Pino JSON con `redact` estricto de secretos. |
-| **RF-08** | Endpoint `GET /health` | **Implementado y verificado (HTTP)** | Responde `200 OK` `{ "status": "ok" }` sin exponer datos internos | Listo para healthchecks de Docker, Railway y Render. |
+| **RF-01** | Registro de usuario | **Implementado y verificado (HTTP + MySQL)** | Suite HTTP (`httpSecurity.test.js`) y suite real `mysql.integration.test.js` contra MySQL local y CI | Validación Zod `.strict()`, correo normalizado + `UNIQUE`, rol forzado `user`, `bcrypt >= 12`. |
+| **RF-02** | Inicio y cierre de sesión | **Implementado y verificado (HTTP + MySQL)** | Regeneración de sesión, cookies `HttpOnly`/`SameSite`, expiración `401`, CSRF `403`, logout | Persistencia real `express-mysql-session` verificada en MySQL local (`sessions`). |
+| **RF-03** | Roles: usuario y administrador | **Implementado y verificado (HTTP + MySQL)** | Bloqueo `403` a `user` en `/api/admin/*`, prevención de auto-cambio de rol, `session_version++` | Admin no tiene acceso automático a notas privadas ajenas. |
+| **RF-04** | CRUD de notas privadas | **Implementado y verificado (HTTP + MySQL)** | Crear, leer, editar, eliminar, límite 50 notas y bloqueo IDOR `403` entre usuarios | Contenido cifrado con AES-256-GCM + AAD `note:<id>:owner:<owner_id>`. |
+| **RF-05** | Dato sensible del perfil cifrado y enmascarado | **Implementado y verificado (HTTP + MySQL)** | Teléfono almacenado cifrado (`v1.`), devuelto como `***-***-3456` y revelado solo tras contraseña | Re-autenticación obligatoria para revelar teléfono completo. |
+| **RF-06** | Recuperación de contraseña | **Implementado y verificado (HTTP + MySQL)** | Token `randomBytes(32)`, hash SHA-256 en MySQL (`UTC_TIMESTAMP()`), uso único y expiración | Requiere credenciales SMTP reales en producción para envío saliente. |
+| **RF-07** | Panel administrativo y bitácora | **Implementado y verificado (HTTP + MySQL + UI)** | Estadísticas, gestión de roles, filtros de bitácora en `security_events` y alertas | Logs Pino JSON con `redact` estricto de secretos. |
+| **RF-08** | Endpoint `GET /health` | **Implementado y verificado (HTTP + MySQL)** | Responde `200 OK` `{ "status": "ok" }` sin exponer datos internos | Listo para healthchecks de Docker, Railway y Render. |
 
 **Funcionalidades complementarias (bonificaciones):** MFA TOTP (`totpService.js` + QR + códigos de recuperación), rotación progresiva de llaves (`v1 -> v2`), Docker multi-stage no-root + Compose, Gitleaks en CI y alertas webhook anti-SSRF.
 
@@ -64,7 +65,7 @@
 ## 5. Resultados Verificados y Pendientes Honestos
 
 - **Backend unitario y HTTP OWASP (`npm --prefix backend test`):** **24/24 pruebas aprobadas (0 fallos)**.
-- **Integración MySQL real (`backend/tests/integration/mysql.integration.test.js`):** Lista con 14 verificaciones reales y configurada en `.github/workflows/ci.yml` contra `mysql:8.4`; omitida localmente por ausencia de servidor MySQL/Docker en la máquina local, y verificada en modo fail-closed (`REQUIRE_MYSQL=true` falla si MySQL no responde).
+- **Integración MySQL real (`backend/tests/integration/mysql.integration.test.js`):** Ejecutada y aprobada localmente contra MySQL `InnoDB`/`utf8mb4` (**3/3 subtests cubriendo las 14 verificaciones reales, 0 fallos**), verificada en modo fail-closed (`REQUIRE_MYSQL=true` falla si MySQL no responde) y configurada en `.github/workflows/ci.yml` contra `mysql:8.4`.
 - **Frontend (`npm --prefix frontend test` y `build`):** **4/4 pruebas aprobadas** y build Vite limpio.
 - **Auditoría de dependencias (`npm audit`):** **0 vulnerabilidades** en backend y **0 vulnerabilidades** en frontend.
 - **Pendientes externos (Etapas 8 y 9 de despliegue):** Push al repositorio GitHub (para ejecutar Gitleaks y MySQL 8.4 en GitHub Actions), despliegue público HTTPS en Railway/Render, verificación funcional sobre la URL pública, **OWASP ZAP Baseline Scan**, **SecurityHeaders.com** y **Qualys SSL Labs**.

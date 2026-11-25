@@ -113,13 +113,13 @@ describe('Suite HTTP de Seguridad OWASP Top 10:2025 & Requisitos Funcionales', (
 
     // Registro válido
     const regRes = await agent.post('/api/auth/register').send({
-      name: 'Josué Varela',
-      email: 'JOSUE@SecureVault.Test',
+      name: 'Ulysses Quiros',
+      email: 'ULYSSES@SecureVault.Test',
       password: 'PasswordSegura!2026',
       phone: '+50688112233'
     });
     assert.equal(regRes.status, 201);
-    assert.equal(regRes.body.user.email, 'josue@securevault.test');
+    assert.equal(regRes.body.user.email, 'ulysses@securevault.test');
     assert.equal(regRes.body.user.role, 'user');
     assert.equal(regRes.body.user.password_hash, undefined);
     assert.ok(regRes.body.csrfToken);
@@ -139,7 +139,7 @@ describe('Suite HTTP de Seguridad OWASP Top 10:2025 & Requisitos Funcionales', (
     // Correo duplicado -> 409
     const dupRes = await request(app).post('/api/auth/register').send({
       name: 'Otro',
-      email: 'josue@securevault.test',
+      email: 'ulysses@securevault.test',
       password: 'PasswordSegura!2026',
       phone: '+50688112233'
     });
@@ -161,7 +161,7 @@ describe('Suite HTTP de Seguridad OWASP Top 10:2025 & Requisitos Funcionales', (
 
     // Nuevo login regenera ID de sesión (anti session-fixation)
     const loginRes = await agent.post('/api/auth/login').send({
-      email: 'josue@securevault.test',
+      email: 'ulysses@securevault.test',
       password: 'PasswordSegura!2026'
     });
     assert.equal(loginRes.status, 200);

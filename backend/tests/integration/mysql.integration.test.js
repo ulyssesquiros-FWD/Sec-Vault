@@ -134,7 +134,7 @@ describe(
 
       // 3 & 11. Registro real vía Express -> verificación bcrypt >= 12 y teléfono AES-256-GCM en MySQL
       const regA = await agentA.post('/api/auth/register').send({
-        name: 'Josué MySQL A',
+        name: 'Ulysses MySQL A',
         email: 'MYSQL_A@SecureVault.Test',
         password: 'ClaveMySQL!2026#A',
         phone: '+506 8812-3456'

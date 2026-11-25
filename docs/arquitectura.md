@@ -1,6 +1,6 @@
 # Arquitectura del Sistema — SecureVault
 
-**Autor:** Josué (Proyecto Individual)  
+**Autor:** Ulysses Quiros (Proyecto Individual)  
 **Última actualización:** 2026-11-25  
 
 ---

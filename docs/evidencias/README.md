@@ -1,6 +1,6 @@
 # Evidencias de Seguridad y Pruebas — SecureVault
 
-**Autor:** Josué (Proyecto Individual)  
+**Autor:** Ulysses Quiros (Proyecto Individual)  
 **Última actualización:** 2026-11-25  
 
 ---
@@ -10,7 +10,7 @@
 | Archivo | Contenido | Resultado Real |
 |---|---|---|
 | [backend-tests.txt](backend-tests.txt) | Salida íntegra de `npm --prefix backend test` (`node --test`: suites unitarias de bcrypt, AES-256-GCM, SHA-256, TOTP, Zod fail-closed y suite HTTP OWASP Top 10:2025). | **24/24 pruebas aprobadas (0 fallos).** |
-| [mysql-integration-check.txt](mysql-integration-check.txt) | Comprobación del comportamiento de `npm --prefix backend run test:integration` (omisión local sin MySQL vs fallo estricto cuando `REQUIRE_MYSQL=true` y MySQL no está disponible). | **Verificado:** sin servicio local falla al exigir `REQUIRE_MYSQL=true` (no reporta falso éxito). |
+| [mysql-integration-check.txt](mysql-integration-check.txt) | Salida real de `npm --prefix backend run test:integration` contra MySQL local (`REQUIRE_MYSQL=true`, 14 verificaciones InnoDB/utf8mb4) y comprobación fail-closed con puerto inaccesible. | **3/3 pruebas reales de integración MySQL aprobadas (0 fallos);** modo fail-closed con `REQUIRE_MYSQL=true` confirmado (`ExitCode=1`). |
 | [frontend-tests-and-build.txt](frontend-tests-and-build.txt) | Salida de `npm --prefix frontend test` (Vitest + React Testing Library) y `npm --prefix frontend run build` (Vite). | **4/4 pruebas aprobadas**; build limpio en `frontend/dist`. |
 | [npm-audit.txt](npm-audit.txt) | Salida real de `npm --prefix backend audit --audit-level=high` y `npm --prefix frontend audit --audit-level=high`. | **0 vulnerabilidades** en backend y frontend. |
 
@@ -19,7 +19,7 @@
 ## 2. Verificaciones Pendientes (Requieren GitHub Actions y Despliegue Público)
 
 ### A. Pipeline GitHub Actions (Gitleaks + MySQL 8.4 real + 6 jobs)
-Tras hacer `git push -u origin main`, guarda captura de los 6 jobs en verde como `docs/evidencias/github-actions-ci.png`.
+Tras hacer `git push -u origin main`, revisa los 6 jobs en verde en `https://github.com/ulyssesquiros-FWD/Sec-Vault/actions` y guarda captura como `docs/evidencias/github-actions-ci.png`.
 
 ### B. Verificación Funcional sobre URL Pública (`https://TU-DOMINIO`)
 Ejecuta y captura respuestas reales de:

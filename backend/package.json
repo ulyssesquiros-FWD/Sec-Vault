@@ -4,7 +4,7 @@
   "private": true,
   "type": "module",
   "description": "SecureVault REST API - Node.js, Express.js, MySQL, bcrypt, AES-256-GCM y OWASP Top 10:2025",
-  "author": "Josué",
+  "author": "Ulysses Quiros",
   "license": "MIT",
   "engines": {
     "node": ">=22.0.0"

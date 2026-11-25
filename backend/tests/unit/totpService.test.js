@@ -14,7 +14,7 @@ describe('totpService (Bonificación 1 — MFA TOTP RFC 6238)', () => {
     const secret = generateTotpSecret();
     assert.match(secret, /^[A-Z2-7]{32}$/);
 
-    const uri = buildOtpAuthUri({ secret, email: 'josue@securevault.test' });
+    const uri = buildOtpAuthUri({ secret, email: 'ulysses@securevault.test' });
     assert.ok(uri.startsWith('otpauth://totp/'));
     assert.ok(uri.includes(secret));
 

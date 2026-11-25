@@ -3,8 +3,13 @@
   "version": "1.0.0",
   "private": true,
   "description": "SecureVault — Sistema Full Stack seguro con Node.js, Express.js, React, MySQL, bcrypt, AES-256-GCM y OWASP Top 10:2025 (Proyecto Individual)",
-  "author": "Josué",
+  "author": "Ulysses Quiros",
   "license": "MIT",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/ulyssesquiros-FWD/Sec-Vault.git"
+  },
+  "homepage": "https://github.com/ulyssesquiros-FWD/Sec-Vault#readme",
   "engines": {
     "node": ">=22.0.0",
     "npm": ">=10.0.0"

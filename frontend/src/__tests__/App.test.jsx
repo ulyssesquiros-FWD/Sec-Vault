@@ -46,9 +46,9 @@ describe('SecureVault Frontend UI & Seguridad', () => {
       </AuthContext.Provider>
     );
 
-    fireEvent.change(screen.getByLabelText('Nombre completo'), { target: { value: 'Josué' } });
+    fireEvent.change(screen.getByLabelText('Nombre completo'), { target: { value: 'Ulysses Quiros' } });
     fireEvent.change(screen.getByLabelText('Correo electrónico'), {
-      target: { value: 'josue@test.com' }
+      target: { value: 'ulysses@test.com' }
     });
     fireEvent.change(screen.getByLabelText('Teléfono (se almacenará cifrado)'), {
       target: { value: '+506 8812-3456' }

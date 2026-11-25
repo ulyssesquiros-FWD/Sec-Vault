@@ -7,13 +7,13 @@ import { loadConfig } from '../../src/config/env.js';
 describe('Validadores Zod (.strict) y carga de entorno fail-closed', () => {
   it('normaliza correos y rechaza intento de inyectar role=admin en registro (mass assignment)', () => {
     const ok = registerSchema.safeParse({
-      name: '  Josué Varela ',
-      email: '  JOSUE@Ejemplo.COM ',
+      name: '  Ulysses Quiros ',
+      email: '  ULYSSES@Ejemplo.COM ',
       password: 'PasswordSegura!2026',
       phone: '+506 8812-3456'
     });
     assert.equal(ok.success, true);
-    assert.equal(ok.data.email, 'josue@ejemplo.com');
+    assert.equal(ok.data.email, 'ulysses@ejemplo.com');
 
     const escalation = registerSchema.safeParse({
       name: 'Atacante',

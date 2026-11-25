@@ -1,6 +1,9 @@
 # SecureVault
 
-**Sistema Full Stack seguro de bóveda de notas privadas** desarrollado de forma individual por **Josué** con **Node.js, Express.js, React + Vite, MySQL 8.4, bcrypt, AES-256-GCM (`node:crypto`) y controles verificables de OWASP Top 10:2025**.
+[![SecureVault CI/CD](https://github.com/ulyssesquiros-FWD/Sec-Vault/actions/workflows/ci.yml/badge.svg)](https://github.com/ulyssesquiros-FWD/Sec-Vault/actions/workflows/ci.yml)
+
+**Sistema Full Stack seguro de bóveda de notas privadas** desarrollado de forma individual por **Ulysses Quiros** con **Node.js, Express.js, React + Vite, MySQL 8.4, bcrypt, AES-256-GCM (`node:crypto`) y controles verificables de OWASP Top 10:2025**.  
+**Repositorio GitHub:** https://github.com/ulyssesquiros-FWD/Sec-Vault
 
 ---
 
@@ -74,9 +77,11 @@ SecureVault/
 - **Node.js** `>= 22.0.0` LTS y **npm** `>= 10.0.0`.
 - **MySQL** `8.0+` o `8.4 LTS` (local o vía Docker Compose).
 
-### 4.1 Instalar dependencias reproducibles
+### 4.1 Clonar repositorio e instalar dependencias reproducibles
 
 ```bash
+git clone https://github.com/ulyssesquiros-FWD/Sec-Vault.git
+cd Sec-Vault
 npm --prefix backend ci
 npm --prefix frontend ci
 ```
@@ -135,17 +140,19 @@ El servicio `mysql` (`mysql:8.4`) escucha únicamente en `127.0.0.1:3306` dentro
 
 ## 5. Pruebas Automatizadas y Auditoría
 
+**Estado verificado localmente tras la última actualización:** `24/24` pruebas backend (unitarias y HTTP OWASP), `3/3` pruebas reales de integración MySQL (`14` verificaciones), `4/4` pruebas frontend + build limpio en `frontend/dist`, y `0` vulnerabilidades en `npm audit`.
+
 ```bash
-# Pruebas unitarias y suite HTTP de seguridad OWASP Top 10:2025 (backend)
+# Pruebas unitarias y suite HTTP de seguridad OWASP Top 10:2025 (backend: 24/24 aprobadas)
 npm run test:backend
 
-# Pruebas reales de integración contra MySQL 8.4 (requiere MySQL activo y TEST_DB_*)
+# Pruebas reales de integración contra MySQL 8.4/9.x (requiere MySQL activo y TEST_DB_*: 3/3 suites, 14 checks aprobados)
 REQUIRE_MYSQL=true npm run test:integration
 
-# Pruebas de interfaz React y protección anti-XSS (frontend)
+# Pruebas de interfaz React y protección anti-XSS (frontend: 4/4 aprobadas)
 npm run test:frontend
 
-# Auditoría de dependencias (0 vulnerabilidades verificadas)
+# Auditoría de dependencias (0 vulnerabilidades verificadas en backend y frontend)
 npm run audit
 ```
 

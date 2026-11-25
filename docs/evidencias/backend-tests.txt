@@ -7,186 +7,186 @@ TAP version 13
     # Subtest: RF-08 & A02: GET /health mínimo y cabeceras Helmet seguras sin X-Powered-By
     ok 1 - RF-08 & A02: GET /health mínimo y cabeceras Helmet seguras sin X-Powered-By
       ---
-      duration_ms: 50.3167
+      duration_ms: 55.6362
       type: 'test'
       ...
     # Subtest: RF-01, RF-02 & A04/A07: Registro seguro, cookies HttpOnly, regeneración de sesión, CSRF y logout
     ok 2 - RF-01, RF-02 & A04/A07: Registro seguro, cookies HttpOnly, regeneración de sesión, CSRF y logout
       ---
-      duration_ms: 833.658
+      duration_ms: 859.2949
       type: 'test'
       ...
     # Subtest: A07: Expiración de sesión por inactividad invalida el acceso con HTTP 401
     ok 3 - A07: Expiración de sesión por inactividad invalida el acceso con HTTP 401
       ---
-      duration_ms: 1351.1237
+      duration_ms: 1357.485
       type: 'test'
       ...
     # Subtest: RF-04, RF-05 & A01/A05/A06: CRUD de notas cifradas, perfil enmascarado, XSS, no-store e IDOR entre usuarios
     ok 4 - RF-04, RF-05 & A01/A05/A06: CRUD de notas cifradas, perfil enmascarado, XSS, no-store e IDOR entre usuarios
       ---
-      duration_ms: 1264.9263
+      duration_ms: 1267.3188
       type: 'test'
       ...
     # Subtest: RF-03, RF-07 & A01/A05: RBAC estricto, auditoría, SQLi y prevención de auto-cambio de rol
     ok 5 - RF-03, RF-07 & A01/A05: RBAC estricto, auditoría, SQLi y prevención de auto-cambio de rol
       ---
-      duration_ms: 801.7776
+      duration_ms: 803.8026
       type: 'test'
       ...
     # Subtest: A07 & Bonificación 5: Fuerza bruta genera HTTP 429, alerta crítica y validación anti-SSRF
     ok 6 - A07 & Bonificación 5: Fuerza bruta genera HTTP 429, alerta crítica y validación anti-SSRF
       ---
-      duration_ms: 1533.1427
+      duration_ms: 1532.625
       type: 'test'
       ...
     # Subtest: RF-06: Recuperación de contraseña con token SHA-256 de un solo uso e invalidación de sesión
     ok 7 - RF-06: Recuperación de contraseña con token SHA-256 de un solo uso e invalidación de sesión
       ---
-      duration_ms: 1041.7584
+      duration_ms: 1045.7909
       type: 'test'
       ...
     # Subtest: Bonificación 1 (MFA TOTP) y Bonificación 2 (Rotación de llaves v1 -> v2)
     ok 8 - Bonificación 1 (MFA TOTP) y Bonificación 2 (Rotación de llaves v1 -> v2)
       ---
-      duration_ms: 840.9722
+      duration_ms: 851.0132
       type: 'test'
       ...
     # Subtest: A10: Error interno inesperado responde 500 genérico sin stack traces ni detalles SQL
     ok 9 - A10: Error interno inesperado responde 500 genérico sin stack traces ni detalles SQL
       ---
-      duration_ms: 304.538
+      duration_ms: 277.8971
       type: 'test'
       ...
     1..9
 ok 1 - Suite HTTP de Seguridad OWASP Top 10:2025 & Requisitos Funcionales
   ---
-  duration_ms: 8024.4527
+  duration_ms: 8053.3648
   type: 'suite'
   ...
 # Subtest: encryptionService (AES-256-GCM + AAD + Rotación)
     # Subtest: cifra y descifra correctamente con IV aleatorio único por operación
     ok 1 - cifra y descifra correctamente con IV aleatorio único por operación
       ---
-      duration_ms: 3.1586
+      duration_ms: 3.4307
       type: 'test'
       ...
     # Subtest: rechaza contenido manipulado, tag alterado, AAD distinto o llave incorrecta
     ok 2 - rechaza contenido manipulado, tag alterado, AAD distinto o llave incorrecta
       ---
-      duration_ms: 2.8938
+      duration_ms: 5.3012
       type: 'test'
       ...
     # Subtest: soporta descifrado con versión anterior y detecta necesidad de re-cifrado hacia v2
     ok 3 - soporta descifrado con versión anterior y detecta necesidad de re-cifrado hacia v2
       ---
-      duration_ms: 1.4644
+      duration_ms: 1.2499
       type: 'test'
       ...
     # Subtest: enmascara teléfonos dejando únicamente los últimos 4 dígitos
     ok 4 - enmascara teléfonos dejando únicamente los últimos 4 dígitos
       ---
-      duration_ms: 1.5965
+      duration_ms: 0.4444
       type: 'test'
       ...
     1..4
 ok 2 - encryptionService (AES-256-GCM + AAD + Rotación)
   ---
-  duration_ms: 11.741
+  duration_ms: 12.6484
   type: 'suite'
   ...
 # Subtest: passwordService (bcrypt obligatorio >= 12)
     # Subtest: genera hash bcrypt con factor de costo >= 12 y salt distinto cada vez
     ok 1 - genera hash bcrypt con factor de costo >= 12 y salt distinto cada vez
       ---
-      duration_ms: 550.242
+      duration_ms: 542.3248
       type: 'test'
       ...
     # Subtest: verifica positivamente la contraseña correcta y negativamente una incorrecta
     ok 2 - verifica positivamente la contraseña correcta y negativamente una incorrecta
       ---
-      duration_ms: 1012.4881
+      duration_ms: 1037.3371
       type: 'test'
       ...
     # Subtest: rechaza explícitamente contraseñas que exceden 72 bytes UTF-8 (sin truncar silenciosamente)
     ok 3 - rechaza explícitamente contraseñas que exceden 72 bytes UTF-8 (sin truncar silenciosamente)
       ---
-      duration_ms: 1.3252
+      duration_ms: 1.3685
       type: 'test'
       ...
     # Subtest: rechaza factor de costo menor a 12
     ok 4 - rechaza factor de costo menor a 12
       ---
-      duration_ms: 0.1955
+      duration_ms: 0.2013
       type: 'test'
       ...
     1..4
 ok 3 - passwordService (bcrypt obligatorio >= 12)
   ---
-  duration_ms: 1566.3312
+  duration_ms: 1586.2895
   type: 'suite'
   ...
 # Subtest: tokenService (randomBytes 32 + SHA-256)
     # Subtest: genera tokens aleatorios de 32 bytes (64 hex) y calcula hash SHA-256 distinto al token
     ok 1 - genera tokens aleatorios de 32 bytes (64 hex) y calcula hash SHA-256 distinto al token
       ---
-      duration_ms: 4.1815
+      duration_ms: 3.7889
       type: 'test'
       ...
     # Subtest: compara cadenas en tiempo constante rechazando longitudes o valores distintos
     ok 2 - compara cadenas en tiempo constante rechazando longitudes o valores distintos
       ---
-      duration_ms: 0.7171
+      duration_ms: 0.6852
       type: 'test'
       ...
     1..2
 ok 4 - tokenService (randomBytes 32 + SHA-256)
   ---
-  duration_ms: 7.3025
+  duration_ms: 6.7461
   type: 'suite'
   ...
 # Subtest: totpService (Bonificación 1 — MFA TOTP RFC 6238)
     # Subtest: genera secreto Base32, URI otpauth y verifica código TOTP dentro de la ventana válida
     ok 1 - genera secreto Base32, URI otpauth y verifica código TOTP dentro de la ventana válida
       ---
-      duration_ms: 3.7453
+      duration_ms: 4.4081
       type: 'test'
       ...
     # Subtest: genera códigos de recuperación y permite un único consumo por código
     ok 2 - genera códigos de recuperación y permite un único consumo por código
       ---
-      duration_ms: 2.4866
+      duration_ms: 3.2045
       type: 'test'
       ...
     1..2
 ok 5 - totpService (Bonificación 1 — MFA TOTP RFC 6238)
   ---
-  duration_ms: 8.1728
+  duration_ms: 10.1703
   type: 'suite'
   ...
 # Subtest: Validadores Zod (.strict) y carga de entorno fail-closed
     # Subtest: normaliza correos y rechaza intento de inyectar role=admin en registro (mass assignment)
     ok 1 - normaliza correos y rechaza intento de inyectar role=admin en registro (mass assignment)
       ---
-      duration_ms: 8.9204
+      duration_ms: 4.4292
       type: 'test'
       ...
     # Subtest: rechaza notas vacías o mayores a 20,000 caracteres y tokens inválidos
     ok 2 - rechaza notas vacías o mayores a 20,000 caracteres y tokens inválidos
       ---
-      duration_ms: 2.5808
+      duration_ms: 1.6988
       type: 'test'
       ...
     # Subtest: falla en arranque si falta DATA_ENCRYPTION_KEY o se usan valores placeholder en producción
     ok 3 - falla en arranque si falta DATA_ENCRYPTION_KEY o se usan valores placeholder en producción
       ---
-      duration_ms: 9.1558
+      duration_ms: 5.2227
       type: 'test'
       ...
     1..3
 ok 6 - Validadores Zod (.strict) y carga de entorno fail-closed
   ---
-  duration_ms: 22.809
+  duration_ms: 12.6968
   type: 'suite'
   ...
 1..6
@@ -197,4 +197,4 @@ ok 6 - Validadores Zod (.strict) y carga de entorno fail-closed
 # cancelled 0
 # skipped 0
 # todo 0
-# duration_ms 9307.6848
+# duration_ms 9281.3148

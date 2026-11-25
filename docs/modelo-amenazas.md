@@ -1,6 +1,6 @@
 # Modelo de Amenazas STRIDE — SecureVault
 
-**Autor:** Josué (Proyecto Individual)  
+**Autor:** Ulysses Quiros (Proyecto Individual)  
 **Alcance:** Aplicación web Full Stack SecureVault (React SPA, Express.js API, MySQL 8.4, Criptografía AES-256-GCM y bcrypt)  
 **Última actualización:** 2026-11-25  
 

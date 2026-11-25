@@ -78,7 +78,7 @@ export function RegisterPage() {
               className="input"
               value={name}
               onChange={(e) => setName(e.target.value)}
-              placeholder="Ej. Josué Varela"
+              placeholder="Ej. Ulysses Quiros"
               autoComplete="name"
               required
             />
