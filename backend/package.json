@@ -1,0 +1,45 @@
+{
+  "name": "securevault-backend",
+  "version": "1.0.0",
+  "private": true,
+  "type": "module",
+  "description": "SecureVault REST API - Node.js, Express.js, MySQL, bcrypt, AES-256-GCM y OWASP Top 10:2025",
+  "author": "Josué",
+  "license": "MIT",
+  "engines": {
+    "node": ">=22.0.0"
+  },
+  "scripts": {
+    "start": "node src/server.js",
+    "dev": "node --watch src/server.js",
+    "db:migrate": "node src/database/migrate.js",
+    "db:seed": "node src/database/seed.js",
+    "crypto:rotate": "node src/jobs/rotateKeys.js",
+    "test": "node --test tests/unit/*.test.js tests/security/*.test.js",
+    "test:unit": "node --test tests/unit/*.test.js",
+    "test:security": "node --test tests/security/*.test.js",
+    "test:integration": "node --test tests/integration/*.test.js"
+  },
+  "dependencies": {
+    "bcrypt": "^6.0.0",
+    "cors": "^2.8.5",
+    "dotenv": "^16.4.7",
+    "express": "^5.1.0",
+    "express-mysql-session": "^3.0.3",
+    "express-rate-limit": "^8.0.0",
+    "express-session": "^1.18.1",
+    "helmet": "^8.1.0",
+    "mysql2": "^3.24.6",
+    "nodemailer": "^10.6.1",
+    "pino": "^9.6.0",
+    "qrcode": "^1.5.4",
+    "securevault-monorepo": "file:..",
+    "zod": "^4.6.7"
+  },
+  "devDependencies": {
+    "supertest": "^7.1.0"
+  },
+  "overrides": {
+    "mysql2": "^3.24.6"
+  }
+}
