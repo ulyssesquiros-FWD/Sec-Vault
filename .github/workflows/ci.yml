@@ -1,0 +1,124 @@
+name: SecureVault CI/CD
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+    branches: [main]
+
+permissions:
+  contents: read
+
+jobs:
+  secret-scan:
+    name: Escaneo de Secretos (Gitleaks)
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout completo del repositorio
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Ejecutar Gitleaks sobre historial completo
+        uses: gitleaks/gitleaks-action@v2
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+
+  backend-tests-and-audit:
+    name: Backend Tests, MySQL 8.4 Integration & npm audit
+    runs-on: ubuntu-latest
+    services:
+      mysql:
+        image: mysql:8.4
+        env:
+          MYSQL_ROOT_PASSWORD: ci_ephemeral_root_password_987
+          MYSQL_DATABASE: securevault_test
+        ports:
+          - 3306:3306
+        options: >-
+          --health-cmd="mysqladmin ping -h 127.0.0.1 -pci_ephemeral_root_password_987"
+          --health-interval=10s
+          --health-timeout=5s
+          --health-retries=10
+
+    steps:
+      - name: Checkout del código
+        uses: actions/checkout@v4
+
+      - name: Configurar Node.js 22 LTS
+        uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: npm
+          cache-dependency-path: backend/package-lock.json
+
+      - name: Instalar dependencias del backend con npm ci
+        working-directory: backend
+        run: npm ci
+
+      - name: Ejecutar pruebas unitarias y de seguridad HTTP OWASP
+        working-directory: backend
+        run: npm test
+
+      - name: Ejecutar pruebas reales de integración con MySQL 8.4
+        working-directory: backend
+        env:
+          REQUIRE_MYSQL: 'true'
+          TEST_DB_HOST: 127.0.0.1
+          TEST_DB_PORT: 3306
+          TEST_DB_NAME: securevault_test
+          TEST_DB_USER: root
+          TEST_DB_PASSWORD: ci_ephemeral_root_password_987
+          TEST_DB_SSL: 'false'
+        run: npm run test:integration
+
+      - name: Auditoría de dependencias backend (bloquea si hay High/Critical)
+        working-directory: backend
+        run: npm audit --audit-level=high
+
+  frontend-tests-and-build:
+    name: Frontend Tests, Vite Build & npm audit
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout del código
+        uses: actions/checkout@v4
+
+      - name: Configurar Node.js 22 LTS
+        uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: npm
+          cache-dependency-path: frontend/package-lock.json
+
+      - name: Instalar dependencias del frontend con npm ci
+        working-directory: frontend
+        run: npm ci
+
+      - name: Ejecutar pruebas de componentes React y anti-XSS
+        working-directory: frontend
+        run: npm test
+
+      - name: Compilar bundle de producción con Vite
+        working-directory: frontend
+        run: npm run build
+
+      - name: Auditoría de dependencias frontend (bloquea si hay High/Critical)
+        working-directory: frontend
+        run: npm audit --audit-level=high
+
+  deploy:
+    name: Despliegue Condicionado a Verificaciones
+    needs: [secret-scan, backend-tests-and-audit, frontend-tests-and-build]
+    if: github.event_name == 'push' && github.ref == 'refs/heads/main'
+    runs-on: ubuntu-latest
+    steps:
+      - name: Disparar webhook de despliegue si está configurado en GitHub Secrets
+        env:
+          DEPLOY_HOOK_URL: ${{ secrets.DEPLOY_HOOK_URL }}
+        run: |
+          if [ -z "$DEPLOY_HOOK_URL" ]; then
+            echo "DEPLOY_HOOK_URL no configurado en GitHub Secrets. Despliegue automático omitido."
+            exit 0
+          fi
+          curl -fsS -X POST "$DEPLOY_HOOK_URL"
+          echo "Despliegue disparado correctamente tras aprobar todas las verificaciones."

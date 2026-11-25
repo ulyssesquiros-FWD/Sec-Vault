@@ -1,0 +1,43 @@
+services:
+  - type: web
+    name: securevault
+    runtime: docker
+    dockerfilePath: ./Dockerfile
+    plan: free
+    healthCheckPath: /health
+    autoDeploy: true
+    envVars:
+      - key: NODE_ENV
+        value: production
+      - key: PORT
+        value: 4000
+      - key: TRUST_PROXY
+        value: 1
+      - key: DB_SSL
+        value: true
+      - key: BCRYPT_ROUNDS
+        value: 12
+      - key: ENCRYPTION_KEY_VERSION
+        value: v1
+      - key: COOKIE_SAME_SITE
+        value: lax
+      - key: APP_URL
+        sync: false
+      - key: ALLOWED_ORIGIN
+        sync: false
+      - key: DB_HOST
+        sync: false
+      - key: DB_PORT
+        sync: false
+      - key: DB_NAME
+        sync: false
+      - key: DB_USER
+        sync: false
+      - key: DB_PASSWORD
+        sync: false
+      - key: DB_SSL_CA
+        sync: false
+      - key: SESSION_SECRET
+        generateValue: true
+      - key: DATA_ENCRYPTION_KEY
+        sync: false
