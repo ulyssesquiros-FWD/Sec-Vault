@@ -1,3 +1,4 @@
+import crypto from 'node:crypto';
 import { describe, it } from 'node:test';
 import assert from 'node:assert/strict';
 import { registerSchema, resetPasswordSchema } from '../../src/validators/authValidators.js';
@@ -61,6 +62,57 @@ describe('Validadores Zod (.strict) y carga de entorno fail-closed', () => {
         },
         { loadDotenv: false }
       )
+    );
+  });
+
+  it('rechaza reutilizar SESSION_SECRET igual a DATA_ENCRYPTION_KEY y bloquea DB_USER=root o DB_SSL=false en producción', () => {
+    const sharedKey = crypto.randomBytes(32).toString('hex');
+    assert.throws(
+      () =>
+        loadConfig(
+          {
+            NODE_ENV: 'development',
+            SESSION_SECRET: sharedKey,
+            DATA_ENCRYPTION_KEY: sharedKey
+          },
+          { loadDotenv: false }
+        ),
+      /distintas/
+    );
+
+    const distinctSession = crypto.randomBytes(32).toString('hex');
+    assert.throws(
+      () =>
+        loadConfig(
+          {
+            NODE_ENV: 'production',
+            APP_URL: 'https://securevault.example.com',
+            DB_USER: 'root',
+            DB_PASSWORD: 'strong_db_password',
+            DB_SSL: 'true',
+            SESSION_SECRET: distinctSession,
+            DATA_ENCRYPTION_KEY: sharedKey
+          },
+          { loadDotenv: false }
+        ),
+      /root/
+    );
+
+    assert.throws(
+      () =>
+        loadConfig(
+          {
+            NODE_ENV: 'production',
+            APP_URL: 'https://securevault.example.com',
+            DB_USER: 'securevault_app',
+            DB_PASSWORD: 'strong_db_password',
+            DB_SSL: 'false',
+            SESSION_SECRET: distinctSession,
+            DATA_ENCRYPTION_KEY: sharedKey
+          },
+          { loadDotenv: false }
+        ),
+      /DB_SSL/
     );
   });
 });

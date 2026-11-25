@@ -24,6 +24,9 @@ async function runSeed() {
       'Define SEED_ADMIN_EMAIL y SEED_ADMIN_PASSWORD en variables de entorno para inicializar el administrador.'
     );
   }
+  if (adminPassword.length < 12) {
+    throw new Error('SEED_ADMIN_PASSWORD debe tener al menos 12 caracteres.');
+  }
 
   const pool = createPool(config, logger);
   try {

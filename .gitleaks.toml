@@ -7,17 +7,24 @@ useDefault = true
 id = "securevault-encryption-key-hex"
 description = "Detecta llaves AES-256-GCM de 64 caracteres hexadecimales expuestas en el repositorio"
 regex = '''(?i)(DATA_ENCRYPTION_KEY|DATA_ENCRYPTION_PREVIOUS_KEYS)\s*[:=]\s*['"]?(?:v\d+:)?[0-9a-f]{64}['"]?'''
-keywords = ["DATA_ENCRYPTION_KEY", "DATA_ENCRYPTION_PREVIOUS_KEYS"]
+keywords = ["data_encryption_key", "data_encryption_previous_keys"]
 
 [[rules]]
 id = "securevault-session-secret"
 description = "Detecta SESSION_SECRET no vacío expuesto fuera de plantillas"
 regex = '''(?i)SESSION_SECRET\s*[:=]\s*['"]?[A-Za-z0-9!@#$%^&*()_+\-=]{16,}['"]?'''
-keywords = ["SESSION_SECRET"]
+keywords = ["session_secret"]
 
-[allowlist]
+[[allowlists]]
 description = "Permite pruebas sintéticas efímeras y plantillas sin secretos"
 paths = [
   '''^\.env\.example$''',
   '''^backend/tests/'''
+]
+
+[[allowlists]]
+description = "Permite credenciales desechables usadas exclusivamente en contenedores efímeros de GitHub Actions"
+regexes = [
+  '''ci_ephemeral_(?:root_password_987|root_pw_84|app_pw_84|session_secret_32_characters_long)''',
+  '''0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef'''
 ]

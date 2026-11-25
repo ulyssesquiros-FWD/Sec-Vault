@@ -13,7 +13,8 @@ export function createMySQLSessionStore(pool, config) {
     clearExpired: true,
     checkExpirationInterval: 900000, // Limpieza automática cada 15 min
     expiration: config.session.absoluteTimeoutMs,
-    createDatabaseTable: true,
+    // En producción `DB_USER` opera con solo DML (sin CREATE); `001_initial_schema.sql` crea `sessions`.
+    createDatabaseTable: !config.isProduction,
     schema: {
       tableName: 'sessions',
       columnNames: {

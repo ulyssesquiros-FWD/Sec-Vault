@@ -49,6 +49,7 @@
 5. **Suite MySQL real ampliada a 14 verificaciones + CI separado en 6 trabajos:** `mysql.integration.test.js` verifica pool concurrente, InnoDB/UTF8MB4, registro, `UNIQUE`, SQLi, transacciones, rollback, FKs, CRUD cifrado, IDOR, `bcrypt`, `sessions`, `password_resets`, `security_events` y `login_attempts`; falla obligatoriamente si `REQUIRE_MYSQL=true` y MySQL no está accesible.
 6. **Corrección en `docker-compose.yml`:** Se eliminó el montaje de migraciones en `/docker-entrypoint-initdb.d` y se añadió el servicio one-shot `migrate` antes de `app`, dejando valores por defecto de desarrollo local reproducibles sin romper el modo producción del `Dockerfile`.
 7. **Limpieza de `package-lock.json` y `npm ci` reproducible:** Se eliminó la referencia espuria `"securevault-monorepo": "file:.."` en `backend/` y `frontend/` y se verificó `npm ci` limpio en ambos subproyectos (0 vulnerabilidades).
+8. **Endurecimiento final para Railway y Gitleaks v8.30.1:** Se deshabilitó `createDatabaseTable` de sesiones en producción (compatible con usuario DML-only `securevault_app`), se añadió soporte opcional de `MIGRATION_DB_USER` para migraciones DDL, se impidió reutilizar `SESSION_SECRET === DATA_ENCRYPTION_KEY` en `env.js`, se exigió contraseña >= 12 caracteres en `seed.js`, y se actualizó CI para ejecutar `gitleaks` CLI `v8.30.1` directamente con `[[allowlists]]` explícitos.
 
 ---
 
@@ -64,8 +65,9 @@
 
 ## 5. Resultados Verificados y Pendientes Honestos
 
-- **Backend unitario y HTTP OWASP (`npm --prefix backend test`):** **24/24 pruebas aprobadas (0 fallos)**.
+- **Backend unitario y HTTP OWASP (`npm --prefix backend test`):** **25/25 pruebas aprobadas (0 fallos)**.
 - **Integración MySQL real (`backend/tests/integration/mysql.integration.test.js`):** Ejecutada y aprobada localmente contra MySQL `InnoDB`/`utf8mb4` (**3/3 subtests cubriendo las 14 verificaciones reales, 0 fallos**), verificada en modo fail-closed (`REQUIRE_MYSQL=true` falla si MySQL no responde) y configurada en `.github/workflows/ci.yml` contra `mysql:8.4`.
 - **Frontend (`npm --prefix frontend test` y `build`):** **4/4 pruebas aprobadas** y build Vite limpio.
 - **Auditoría de dependencias (`npm audit`):** **0 vulnerabilidades** en backend y **0 vulnerabilidades** en frontend.
-- **Pendientes externos (Etapas 8 y 9 de despliegue):** Push al repositorio GitHub (para ejecutar Gitleaks y MySQL 8.4 en GitHub Actions), despliegue público HTTPS en Railway/Render, verificación funcional sobre la URL pública, **OWASP ZAP Baseline Scan**, **SecurityHeaders.com** y **Qualys SSL Labs**.
+- **Escaneo de secretos (`gitleaks v8.30.1`):** **0 secretos filtrados (`no leaks found`)** en el historial Git completo.
+- **Pendientes externos (Pasos 7–9 de despliegue):** Provisión y secrets en Railway por el autor, despliegue público HTTPS, pruebas E2E en la URL pública, **OWASP ZAP Baseline Scan**, **SecurityHeaders.com** y **Qualys SSL Labs**.

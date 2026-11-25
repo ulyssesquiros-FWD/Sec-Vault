@@ -168,6 +168,10 @@ export function loadConfig(envInput = process.env, options = {}) {
     data.ENCRYPTION_KEY_VERSION
   );
 
+  if (data.SESSION_SECRET === data.DATA_ENCRYPTION_KEY) {
+    throw new Error('SESSION_SECRET y DATA_ENCRYPTION_KEY deben ser llaves criptográficas distintas.');
+  }
+
   if (isProduction) {
     if (looksLikePlaceholder(data.SESSION_SECRET)) {
       throw new Error('SESSION_SECRET no puede usar valores de ejemplo en producción.');

@@ -1,0 +1,11 @@
+=== GITLEAKS CLI v8.30.1 (gitleaks git . --config .gitleaks.toml --redact --verbose) ===
+
+    ○
+    │╲
+    │ ○
+    ○ ░
+    ░    gitleaks
+
+10:57AM INF 12 commits scanned.
+10:57AM INF scanned ~669934 bytes (669.93 KB) in 551ms
+10:57AM INF no leaks found

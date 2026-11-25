@@ -19,12 +19,21 @@ export async function runMigrations(configInput = null) {
 
   const ssl = buildSslOptions(config.db);
 
+  const migrationUser =
+    !configInput && process.env.MIGRATION_DB_USER?.trim()
+      ? process.env.MIGRATION_DB_USER.trim()
+      : config.db.user;
+  const migrationPassword =
+    !configInput && process.env.MIGRATION_DB_USER?.trim()
+      ? (process.env.MIGRATION_DB_PASSWORD ?? '')
+      : config.db.password;
+
   const conn = await mysql.createConnection({
     host: config.db.host,
     port: config.db.port,
     database: config.db.database,
-    user: config.db.user,
-    password: config.db.password,
+    user: migrationUser,
+    password: migrationPassword,
     multipleStatements: true,
     charset: 'utf8mb4',
     ...(ssl ? { ssl } : {})

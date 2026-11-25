@@ -19,10 +19,16 @@ jobs:
         with:
           fetch-depth: 0
 
+      - name: Instalar Gitleaks CLI oficial (v8.30.1)
+        run: |
+          curl -fsSL https://github.com/gitleaks/gitleaks/releases/download/v8.30.1/gitleaks_8.30.1_linux_x64.tar.gz -o /tmp/gitleaks.tar.gz
+          sudo tar -xzf /tmp/gitleaks.tar.gz -C /usr/local/bin gitleaks
+          rm -f /tmp/gitleaks.tar.gz
+          gitleaks version
+
       - name: Ejecutar Gitleaks sobre todo el historial Git
-        uses: gitleaks/gitleaks-action@v2
-        env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          gitleaks git . --config .gitleaks.toml --redact --verbose
 
   backend-tests:
     name: 2. Backend Unit & OWASP HTTP Tests

@@ -96,7 +96,7 @@ node -e "console.log('SESSION_SECRET=' + require('crypto').randomBytes(32).toStr
 node -e "console.log('DATA_ENCRYPTION_KEY=' + require('crypto').randomBytes(32).toString('hex'))"
 ```
 
-Completa `DB_HOST`, `DB_PORT`, `DB_NAME`, `DB_USER`, `DB_PASSWORD`, `SESSION_SECRET` y `DATA_ENCRYPTION_KEY`. En producción, utiliza un usuario MySQL de privilegios mínimos (nunca `root`) y `DB_SSL=true` (añadiendo `DB_SSL_CA` en formato PEM, ruta o Base64 si tu proveedor gestionado usa una CA privada).
+Completa `DB_HOST`, `DB_PORT`, `DB_NAME`, `DB_USER`, `DB_PASSWORD`, `SESSION_SECRET` y `DATA_ENCRYPTION_KEY` (siempre llaves criptográficas distintas). En producción, utiliza un usuario MySQL de privilegios mínimos solo DML (`securevault_app`, nunca `root`) y `DB_SSL=true` (añadiendo `DB_SSL_CA` en formato PEM, ruta o Base64 si tu proveedor gestionado usa una CA privada). Si deseas separar DDL de runtime durante `preDeployCommand`, define adicionalmente `MIGRATION_DB_USER` y `MIGRATION_DB_PASSWORD` para `npm run db:migrate`.
 
 ### 4.3 Crear base de datos, usuario mínimo y ejecutar migraciones
 
@@ -140,10 +140,10 @@ El servicio `mysql` (`mysql:8.4`) escucha únicamente en `127.0.0.1:3306` dentro
 
 ## 5. Pruebas Automatizadas y Auditoría
 
-**Estado verificado localmente tras la última actualización:** `24/24` pruebas backend (unitarias y HTTP OWASP), `3/3` pruebas reales de integración MySQL (`14` verificaciones), `4/4` pruebas frontend + build limpio en `frontend/dist`, y `0` vulnerabilidades en `npm audit`.
+**Estado verificado localmente tras la última actualización:** `25/25` pruebas backend (unitarias y HTTP OWASP), `3/3` pruebas reales de integración MySQL (`14` verificaciones), `4/4` pruebas frontend + build limpio en `frontend/dist`, `0` secretos en historial (`gitleaks v8.30.1`) y `0` vulnerabilidades en `npm audit`.
 
 ```bash
-# Pruebas unitarias y suite HTTP de seguridad OWASP Top 10:2025 (backend: 24/24 aprobadas)
+# Pruebas unitarias y suite HTTP de seguridad OWASP Top 10:2025 (backend: 25/25 aprobadas)
 npm run test:backend
 
 # Pruebas reales de integración contra MySQL 8.4/9.x (requiere MySQL activo y TEST_DB_*: 3/3 suites, 14 checks aprobados)

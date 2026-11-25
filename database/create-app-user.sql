@@ -24,8 +24,14 @@ GRANT SELECT, INSERT, UPDATE, DELETE
   ON securevault.*
   TO 'securevault_app'@'%';
 
--- Si `securevault_app` ejecutará `npm run db:migrate` en el despliegue inicial,
--- otorgar CREATE, ALTER, INDEX únicamente durante la ventana de migración o
--- ejecutar `migrate.js` con un usuario dedicado de migraciones.
+-- Usuario opcional dedicado exclusivamente para migraciones DDL (`npm run db:migrate` / preDeployCommand)
+-- mediante MIGRATION_DB_USER y MIGRATION_DB_PASSWORD, permitiendo que la API en runtime opere
+-- estrictamente con `securevault_app` limitado a DML:
+-- CREATE USER IF NOT EXISTS 'securevault_migrator'@'%'
+--   IDENTIFIED BY 'REEMPLAZAR_PASSWORD_MIGRATOR_FUERTE'
+--   REQUIRE SSL;
+-- GRANT SELECT, INSERT, UPDATE, DELETE, CREATE, ALTER, INDEX, REFERENCES
+--   ON securevault.*
+--   TO 'securevault_migrator'@'%';
 
 FLUSH PRIVILEGES;
