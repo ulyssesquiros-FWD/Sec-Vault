@@ -41,7 +41,8 @@ flowchart LR
 
 En producción, Express sirve los archivos compilados de `frontend/dist` bajo el mismo dominio (`APP_URL`), eliminando problemas de cookies de terceros (`third-party cookies`). Todas las peticiones autenticadas viajan con `credentials: 'include'`:
 
-- Las operaciones de lectura (`GET`) validan la cookie de sesión `secvault.sid` (`HttpOnly`, `Secure` en producción, `SameSite=Lax` o `Strict`).
+- Las operaciones de lectura (`GET`) validan la cookie de sesión `secvault.sid` (`HttpOnly`, `Secure` en producción, `SameSite=Lax` o `Strict`) y reciben `Cache-Control: no-store, no-cache, must-revalidate, private` en `/api/*` para evitar almacenamiento en caché de notas descifradas o datos personales.
+- El middleware `express-session` se monta acotado a `/api` (no sobre archivos estáticos del SPA) para minimizar lecturas innecesarias a MySQL.
 - Las operaciones de escritura (`POST`, `PUT`, `PATCH`, `DELETE`) exigen adicionalmente la cabecera `X-CSRF-Token`, generada aleatoriamente por el servidor al iniciar/regenerar la sesión y verificada con `crypto.timingSafeEqual`.
 
 ### Diagrama 2: Comunicación Frontend / Backend y Protección de Sesión/CSRF
@@ -217,8 +218,8 @@ sequenceDiagram
     API-->>U: "200 OK (Mensaje genérico idéntico exista o no el correo)"
 
     U->>API: "POST /api/auth/reset-password { token, newPassword }"
-    API->>DB: "Buscar por SHA-256(token) con used_at IS NULL y expires_at > NOW()"
-    API->>DB: "Transacción: bcrypt.hash(newPassword, 12) + marcar used_at + session_version++"
+    API->>DB: "Buscar por SHA-256(token) con used_at IS NULL y expires_at > UTC_TIMESTAMP()"
+    API->>DB: "Transacción: bcrypt.hash(newPassword, 12) + marcar used_at (UTC) + session_version++"
     API-->>U: "200 OK (Todas las sesiones anteriores quedan invalidadas)"
 ```
 

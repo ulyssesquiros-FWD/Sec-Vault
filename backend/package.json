@@ -33,7 +33,6 @@
     "nodemailer": "^10.6.1",
     "pino": "^9.6.0",
     "qrcode": "^1.5.4",
-    "securevault-monorepo": "file:..",
     "zod": "^4.6.7"
   },
   "devDependencies": {

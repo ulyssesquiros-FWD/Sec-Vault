@@ -1,5 +1,5 @@
-﻿=== BACKEND NPM AUDIT ===
+﻿=== BACKEND NPM AUDIT (--audit-level=high) ===
 found 0 vulnerabilities
 
-=== FRONTEND NPM AUDIT ===
+=== FRONTEND NPM AUDIT (--audit-level=high) ===
 found 0 vulnerabilities
