@@ -1,0 +1,5 @@
+﻿=== BACKEND NPM AUDIT ===
+found 0 vulnerabilities
+
+=== FRONTEND NPM AUDIT ===
+found 0 vulnerabilities
