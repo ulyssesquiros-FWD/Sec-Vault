@@ -5,12 +5,12 @@
 
  RUN  v5.1.2 C:/Users/dell5/UQV/Backend/SecVault/frontend
 
- ✓ src/__tests__/App.test.jsx (4 tests) 241ms
+ ✓ src/__tests__/App.test.jsx (4 tests) 264ms
 
  Test Files  1 passed (1)
       Tests  4 passed (4)
-   Start at  10:55:49
-   Duration  4.05s (environment 65%, import 14%, setup 12%, tests 6%, transform 2%, worker 1%)
+   Start at  14:10:20
+   Duration  4.38s (environment 61%, import 14%, setup 12%, tests 6%, transform 2%, worker 1%)
 
 
 > securevault-frontend@1.0.0 build
@@ -24,4 +24,4 @@ computing gzip size...
 dist/index.html                   0.48 kB │ gzip:  0.31 kB
 dist/assets/index-DIBsc8iN.css   11.21 kB │ gzip:  2.92 kB
 dist/assets/index-BlGRBhpS.js   326.66 kB │ gzip: 98.28 kB
-✓ built in 4.94s
+✓ built in 5.43s

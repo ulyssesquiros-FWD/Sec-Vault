@@ -1,6 +1,11 @@
 import { loadConfig } from './config/env.js';
 import { createLogger } from './config/logger.js';
-import { createPool, checkDatabaseHealth } from './config/database.js';
+import {
+  createPool,
+  checkDatabaseHealth,
+  getDatabaseTlsStatus,
+  classifyDatabaseError
+} from './config/database.js';
 import { createMySQLSessionStore, createSessionMiddleware } from './config/session.js';
 import { createApp } from './app.js';
 
@@ -13,8 +18,19 @@ async function startServer() {
   const logger = createLogger(config);
 
   pool = createPool(config, logger);
-  await checkDatabaseHealth(pool);
-  logger.info('Conexión verificada con MySQL');
+  await checkDatabaseHealth(pool, { requireTls: config.db.ssl });
+  const tlsStatus = config.db.ssl ? await getDatabaseTlsStatus(pool) : { tlsActive: false, cipher: null, version: null };
+  logger.info(
+    {
+      sslRequired: config.db.ssl,
+      tlsActive: tlsStatus.tlsActive,
+      tlsVersion: tlsStatus.version,
+      tlsCipher: tlsStatus.cipher,
+      caPinned: Boolean(config.db.sslCa),
+      verifyIdentity: config.db.sslVerifyIdentity
+    },
+    'Conexión verificada con MySQL'
+  );
 
   sessionStore = createMySQLSessionStore(pool, config);
   await sessionStore.onReady();
@@ -76,7 +92,11 @@ async function startServer() {
 }
 
 startServer().catch((err) => {
-  // Error al inicializar configuración o base de datos -> fail closed
-  console.error('Fallo crítico al iniciar SecureVault:', err.message);
+  // Error al inicializar configuración o base de datos -> fail closed con diagnóstico seguro sin secretos
+  const classified = classifyDatabaseError(err);
+  console.error(
+    `Fallo crítico al iniciar SecureVault [${classified.label} | ${classified.code}]: ${classified.message}`
+  );
+  console.error(`Acción sugerida: ${classified.guidance}`);
   process.exit(1);
 });

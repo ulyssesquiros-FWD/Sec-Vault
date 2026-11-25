@@ -114,5 +114,38 @@ describe('Validadores Zod (.strict) y carga de entorno fail-closed', () => {
         ),
       /DB_SSL/
     );
+
+    assert.throws(
+      () =>
+        loadConfig(
+          {
+            NODE_ENV: 'production',
+            APP_URL: 'https://securevault.example.com',
+            DB_USER: 'securevault_app',
+            DB_PASSWORD: 'strong_db_password',
+            DB_SSL: 'true',
+            DB_SSL_CA: 'not-a-valid-ca-pem',
+            SESSION_SECRET: distinctSession,
+            DATA_ENCRYPTION_KEY: sharedKey
+          },
+          { loadDotenv: false }
+        ),
+      /DB_SSL_CA/
+    );
+
+    const prodDefaultSsl = loadConfig(
+      {
+        NODE_ENV: 'production',
+        APP_URL: 'https://securevault.example.com',
+        DB_USER: 'securevault_app',
+        DB_PASSWORD: 'strong_db_password',
+        DB_SSL_VERIFY_IDENTITY: 'true',
+        SESSION_SECRET: distinctSession,
+        DATA_ENCRYPTION_KEY: sharedKey
+      },
+      { loadDotenv: false }
+    );
+    assert.equal(prodDefaultSsl.db.ssl, true);
+    assert.equal(prodDefaultSsl.db.sslVerifyIdentity, true);
   });
 });

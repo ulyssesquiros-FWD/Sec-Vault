@@ -3,6 +3,7 @@ import path from 'node:path';
 import { fileURLToPath } from 'node:url';
 import dotenv from 'dotenv';
 import { z } from 'zod';
+import { buildSslOptions } from './database.js';
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
@@ -99,6 +100,7 @@ const rawEnvSchema = z.object({
   DB_PASSWORD: z.string().default(''),
   DB_SSL: z.string().optional(),
   DB_SSL_CA: z.string().optional(),
+  DB_SSL_VERIFY_IDENTITY: z.string().optional(),
   DB_CONNECTION_LIMIT: z.coerce.number().int().min(2).max(100).default(10),
 
   SESSION_SECRET: z.string().min(32, 'SESSION_SECRET debe tener al menos 32 caracteres.'),
@@ -161,6 +163,7 @@ export function loadConfig(envInput = process.env, options = {}) {
   const data = parsed.data;
   const isProduction = data.NODE_ENV === 'production';
   const dbSsl = parseBooleanEnv(data.DB_SSL, isProduction);
+  const dbSslVerifyIdentity = parseBooleanEnv(data.DB_SSL_VERIFY_IDENTITY, false);
   const smtpSecure = parseBooleanEnv(data.SMTP_SECURE, data.SMTP_PORT === 465);
   const trustProxy = parseTrustProxy(data.TRUST_PROXY, isProduction);
   const previousKeys = parsePreviousEncryptionKeys(
@@ -200,6 +203,14 @@ export function loadConfig(envInput = process.env, options = {}) {
     throw new Error('COOKIE_SAME_SITE=none requiere cookies Secure sobre HTTPS (NODE_ENV=production).');
   }
 
+  if (dbSsl && data.DB_SSL_CA) {
+    buildSslOptions({
+      ssl: dbSsl,
+      sslCa: data.DB_SSL_CA,
+      sslVerifyIdentity: dbSslVerifyIdentity
+    });
+  }
+
   const keyRing = new Map(previousKeys);
   keyRing.set(data.ENCRYPTION_KEY_VERSION, Buffer.from(data.DATA_ENCRYPTION_KEY, 'hex'));
 
@@ -219,6 +230,7 @@ export function loadConfig(envInput = process.env, options = {}) {
       password: data.DB_PASSWORD,
       ssl: dbSsl,
       sslCa: data.DB_SSL_CA || '',
+      sslVerifyIdentity: dbSslVerifyIdentity,
       connectionLimit: data.DB_CONNECTION_LIMIT
     },
     session: {

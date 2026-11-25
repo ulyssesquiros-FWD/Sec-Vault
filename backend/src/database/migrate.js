@@ -4,7 +4,7 @@ import { fileURLToPath } from 'node:url';
 import mysql from 'mysql2/promise';
 import { loadConfig } from '../config/env.js';
 import { createLogger } from '../config/logger.js';
-import { buildSslOptions } from '../config/database.js';
+import { buildSslOptions, classifyDatabaseError } from '../config/database.js';
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
@@ -40,6 +40,15 @@ export async function runMigrations(configInput = null) {
   });
 
   try {
+    if (config.db.ssl) {
+      const [sslRows] = await conn.query("SHOW STATUS LIKE 'Ssl_cipher'");
+      if (!sslRows[0]?.Value) {
+        const tlsErr = new Error('MySQL no negoció una sesión TLS activa pese a requerirse conexión TLS obligatoria.');
+        tlsErr.code = 'ERR_TLS_REQUIRED';
+        throw tlsErr;
+      }
+    }
+
     await conn.execute(`
       CREATE TABLE IF NOT EXISTS schema_migrations (
         version VARCHAR(64) NOT NULL,
@@ -94,7 +103,11 @@ if (isMain) {
       process.exit(0);
     })
     .catch((err) => {
-      console.error('Error ejecutando migraciones:', err.message);
+      const classified = classifyDatabaseError(err);
+      console.error(
+        `Error ejecutando migraciones [${classified.label} | ${classified.code}]: ${classified.message}`
+      );
+      console.error(`Acción sugerida: ${classified.guidance}`);
       process.exit(1);
     });
 }

@@ -4,7 +4,12 @@ import assert from 'node:assert/strict';
 import request from 'supertest';
 import { loadConfig } from '../../src/config/env.js';
 import { createLogger } from '../../src/config/logger.js';
-import { createPool, checkDatabaseHealth, withTransaction } from '../../src/config/database.js';
+import {
+  createPool,
+  checkDatabaseHealth,
+  withTransaction,
+  classifyDatabaseError
+} from '../../src/config/database.js';
 import { createMySQLSessionStore, createSessionMiddleware } from '../../src/config/session.js';
 import { runMigrations } from '../../src/database/migrate.js';
 import { createApp } from '../../src/app.js';
@@ -125,6 +130,32 @@ describe(
         assert.ok(found, `Falta la tabla obligatoria ${tableName}`);
         assert.equal(found.ENGINE, 'InnoDB');
         assert.ok(found.TABLE_COLLATION.startsWith('utf8mb4_'));
+      }
+
+      // Verificar rechazo estricto de certificado TLS autofirmado sin CA confiable cuando SSL está activo
+      if (!config.db.ssl) {
+        const strictTlsPool = createPool({
+          ...config,
+          db: {
+            ...config.db,
+            ssl: true,
+            sslCa: ''
+          }
+        });
+        try {
+          await assert.rejects(
+            () => checkDatabaseHealth(strictTlsPool, { requireTls: true }),
+            (err) => {
+              const classified = classifyDatabaseError(err);
+              assert.equal(classified.category, 'TLS_CERTIFICATE_ERROR');
+              return true;
+            }
+          );
+        } finally {
+          await strictTlsPool.end();
+        }
+      } else {
+        assert.equal(await checkDatabaseHealth(pool, { requireTls: true }), true);
       }
     });
 

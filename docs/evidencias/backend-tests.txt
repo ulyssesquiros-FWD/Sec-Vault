@@ -3,204 +3,229 @@
 > node --test tests/unit/*.test.js tests/security/*.test.js
 
 TAP version 13
+# Subtest: Seguridad TLS MySQL (buildSslOptions, classifyDatabaseError y handshake TLS real)
+    # Subtest: buildSslOptions exige rejectUnauthorized=true, TLSv1.2+ y soporta PEM, Base64 y archivo sin aceptar llaves privadas
+    ok 1 - buildSslOptions exige rejectUnauthorized=true, TLSv1.2+ y soporta PEM, Base64 y archivo sin aceptar llaves privadas
+      ---
+      duration_ms: 43.9361
+      type: 'test'
+      ...
+    # Subtest: classifyDatabaseError identifica los 5 tipos de error y redacta credenciales/PEM
+    ok 2 - classifyDatabaseError identifica los 5 tipos de error y redacta credenciales/PEM
+      ---
+      duration_ms: 0.7699
+      type: 'test'
+      ...
+    # Subtest: mysql2 rechaza certificados autofirmados no confiables y conecta con éxito cuando se fija DB_SSL_CA
+    ok 3 - mysql2 rechaza certificados autofirmados no confiables y conecta con éxito cuando se fija DB_SSL_CA
+      ---
+      duration_ms: 127.5618
+      type: 'test'
+      ...
+    1..3
+ok 1 - Seguridad TLS MySQL (buildSslOptions, classifyDatabaseError y handshake TLS real)
+  ---
+  duration_ms: 2338.4091
+  type: 'suite'
+  ...
 # Subtest: Suite HTTP de Seguridad OWASP Top 10:2025 & Requisitos Funcionales
     # Subtest: RF-08 & A02: GET /health mínimo y cabeceras Helmet seguras sin X-Powered-By
     ok 1 - RF-08 & A02: GET /health mínimo y cabeceras Helmet seguras sin X-Powered-By
       ---
-      duration_ms: 55.1758
+      duration_ms: 70.7193
       type: 'test'
       ...
     # Subtest: RF-01, RF-02 & A04/A07: Registro seguro, cookies HttpOnly, regeneración de sesión, CSRF y logout
     ok 2 - RF-01, RF-02 & A04/A07: Registro seguro, cookies HttpOnly, regeneración de sesión, CSRF y logout
       ---
-      duration_ms: 848.9507
+      duration_ms: 843.8559
       type: 'test'
       ...
     # Subtest: A07: Expiración de sesión por inactividad invalida el acceso con HTTP 401
     ok 3 - A07: Expiración de sesión por inactividad invalida el acceso con HTTP 401
       ---
-      duration_ms: 1352.6816
+      duration_ms: 1353.0803
       type: 'test'
       ...
     # Subtest: RF-04, RF-05 & A01/A05/A06: CRUD de notas cifradas, perfil enmascarado, XSS, no-store e IDOR entre usuarios
     ok 4 - RF-04, RF-05 & A01/A05/A06: CRUD de notas cifradas, perfil enmascarado, XSS, no-store e IDOR entre usuarios
       ---
-      duration_ms: 1270.0568
+      duration_ms: 1319.9383
       type: 'test'
       ...
     # Subtest: RF-03, RF-07 & A01/A05: RBAC estricto, auditoría, SQLi y prevención de auto-cambio de rol
     ok 5 - RF-03, RF-07 & A01/A05: RBAC estricto, auditoría, SQLi y prevención de auto-cambio de rol
       ---
-      duration_ms: 800.9426
+      duration_ms: 800.1452
       type: 'test'
       ...
     # Subtest: A07 & Bonificación 5: Fuerza bruta genera HTTP 429, alerta crítica y validación anti-SSRF
     ok 6 - A07 & Bonificación 5: Fuerza bruta genera HTTP 429, alerta crítica y validación anti-SSRF
       ---
-      duration_ms: 1532.9199
+      duration_ms: 1552.0271
       type: 'test'
       ...
     # Subtest: RF-06: Recuperación de contraseña con token SHA-256 de un solo uso e invalidación de sesión
     ok 7 - RF-06: Recuperación de contraseña con token SHA-256 de un solo uso e invalidación de sesión
       ---
-      duration_ms: 1041.5043
+      duration_ms: 1037.2918
       type: 'test'
       ...
     # Subtest: Bonificación 1 (MFA TOTP) y Bonificación 2 (Rotación de llaves v1 -> v2)
     ok 8 - Bonificación 1 (MFA TOTP) y Bonificación 2 (Rotación de llaves v1 -> v2)
       ---
-      duration_ms: 837.5251
+      duration_ms: 864.8559
       type: 'test'
       ...
     # Subtest: A10: Error interno inesperado responde 500 genérico sin stack traces ni detalles SQL
     ok 9 - A10: Error interno inesperado responde 500 genérico sin stack traces ni detalles SQL
       ---
-      duration_ms: 269.9151
+      duration_ms: 265.0184
       type: 'test'
       ...
     1..9
-ok 1 - Suite HTTP de Seguridad OWASP Top 10:2025 & Requisitos Funcionales
+ok 2 - Suite HTTP de Seguridad OWASP Top 10:2025 & Requisitos Funcionales
   ---
-  duration_ms: 8012.5603
+  duration_ms: 8109.4249
   type: 'suite'
   ...
 # Subtest: encryptionService (AES-256-GCM + AAD + Rotación)
     # Subtest: cifra y descifra correctamente con IV aleatorio único por operación
     ok 1 - cifra y descifra correctamente con IV aleatorio único por operación
       ---
-      duration_ms: 4.3966
+      duration_ms: 4.6354
       type: 'test'
       ...
     # Subtest: rechaza contenido manipulado, tag alterado, AAD distinto o llave incorrecta
     ok 2 - rechaza contenido manipulado, tag alterado, AAD distinto o llave incorrecta
       ---
-      duration_ms: 3.0856
+      duration_ms: 2.9815
       type: 'test'
       ...
     # Subtest: soporta descifrado con versión anterior y detecta necesidad de re-cifrado hacia v2
     ok 3 - soporta descifrado con versión anterior y detecta necesidad de re-cifrado hacia v2
       ---
-      duration_ms: 3.2117
+      duration_ms: 1.3535
       type: 'test'
       ...
     # Subtest: enmascara teléfonos dejando únicamente los últimos 4 dígitos
     ok 4 - enmascara teléfonos dejando únicamente los últimos 4 dígitos
       ---
-      duration_ms: 0.6948
+      duration_ms: 0.5068
       type: 'test'
       ...
     1..4
-ok 2 - encryptionService (AES-256-GCM + AAD + Rotación)
+ok 3 - encryptionService (AES-256-GCM + AAD + Rotación)
   ---
-  duration_ms: 14.1474
+  duration_ms: 11.8643
   type: 'suite'
   ...
 # Subtest: passwordService (bcrypt obligatorio >= 12)
     # Subtest: genera hash bcrypt con factor de costo >= 12 y salt distinto cada vez
     ok 1 - genera hash bcrypt con factor de costo >= 12 y salt distinto cada vez
       ---
-      duration_ms: 534.6696
+      duration_ms: 547.3
       type: 'test'
       ...
     # Subtest: verifica positivamente la contraseña correcta y negativamente una incorrecta
     ok 2 - verifica positivamente la contraseña correcta y negativamente una incorrecta
       ---
-      duration_ms: 1026.8251
+      duration_ms: 1035.9798
       type: 'test'
       ...
     # Subtest: rechaza explícitamente contraseñas que exceden 72 bytes UTF-8 (sin truncar silenciosamente)
     ok 3 - rechaza explícitamente contraseñas que exceden 72 bytes UTF-8 (sin truncar silenciosamente)
       ---
-      duration_ms: 1.7616
+      duration_ms: 1.6422
       type: 'test'
       ...
     # Subtest: rechaza factor de costo menor a 12
     ok 4 - rechaza factor de costo menor a 12
       ---
-      duration_ms: 0.2388
+      duration_ms: 0.2505
       type: 'test'
       ...
     1..4
-ok 3 - passwordService (bcrypt obligatorio >= 12)
+ok 4 - passwordService (bcrypt obligatorio >= 12)
   ---
-  duration_ms: 1565.1363
+  duration_ms: 1587.3963
   type: 'suite'
   ...
 # Subtest: tokenService (randomBytes 32 + SHA-256)
     # Subtest: genera tokens aleatorios de 32 bytes (64 hex) y calcula hash SHA-256 distinto al token
     ok 1 - genera tokens aleatorios de 32 bytes (64 hex) y calcula hash SHA-256 distinto al token
       ---
-      duration_ms: 3.4475
+      duration_ms: 3.2894
       type: 'test'
       ...
     # Subtest: compara cadenas en tiempo constante rechazando longitudes o valores distintos
     ok 2 - compara cadenas en tiempo constante rechazando longitudes o valores distintos
       ---
-      duration_ms: 0.697
+      duration_ms: 0.6974
       type: 'test'
       ...
     1..2
-ok 4 - tokenService (randomBytes 32 + SHA-256)
+ok 5 - tokenService (randomBytes 32 + SHA-256)
   ---
-  duration_ms: 6.7887
+  duration_ms: 6.5416
   type: 'suite'
   ...
 # Subtest: totpService (Bonificación 1 — MFA TOTP RFC 6238)
     # Subtest: genera secreto Base32, URI otpauth y verifica código TOTP dentro de la ventana válida
     ok 1 - genera secreto Base32, URI otpauth y verifica código TOTP dentro de la ventana válida
       ---
-      duration_ms: 3.8735
+      duration_ms: 5.9889
       type: 'test'
       ...
     # Subtest: genera códigos de recuperación y permite un único consumo por código
     ok 2 - genera códigos de recuperación y permite un único consumo por código
       ---
-      duration_ms: 1.7698
+      duration_ms: 2.3083
       type: 'test'
       ...
     1..2
-ok 5 - totpService (Bonificación 1 — MFA TOTP RFC 6238)
+ok 6 - totpService (Bonificación 1 — MFA TOTP RFC 6238)
   ---
-  duration_ms: 7.8211
+  duration_ms: 10.681
   type: 'suite'
   ...
 # Subtest: Validadores Zod (.strict) y carga de entorno fail-closed
     # Subtest: normaliza correos y rechaza intento de inyectar role=admin en registro (mass assignment)
     ok 1 - normaliza correos y rechaza intento de inyectar role=admin en registro (mass assignment)
       ---
-      duration_ms: 4.5083
+      duration_ms: 6.6412
       type: 'test'
       ...
     # Subtest: rechaza notas vacías o mayores a 20,000 caracteres y tokens inválidos
     ok 2 - rechaza notas vacías o mayores a 20,000 caracteres y tokens inválidos
       ---
-      duration_ms: 1.2728
+      duration_ms: 1.4446
       type: 'test'
       ...
     # Subtest: falla en arranque si falta DATA_ENCRYPTION_KEY o se usan valores placeholder en producción
     ok 3 - falla en arranque si falta DATA_ENCRYPTION_KEY o se usan valores placeholder en producción
       ---
-      duration_ms: 4.0414
+      duration_ms: 6.0399
       type: 'test'
       ...
     # Subtest: rechaza reutilizar SESSION_SECRET igual a DATA_ENCRYPTION_KEY y bloquea DB_USER=root o DB_SSL=false en producción
     ok 4 - rechaza reutilizar SESSION_SECRET igual a DATA_ENCRYPTION_KEY y bloquea DB_USER=root o DB_SSL=false en producción
       ---
-      duration_ms: 1.7659
+      duration_ms: 2.109
       type: 'test'
       ...
     1..4
-ok 6 - Validadores Zod (.strict) y carga de entorno fail-closed
+ok 7 - Validadores Zod (.strict) y carga de entorno fail-closed
   ---
-  duration_ms: 12.89
+  duration_ms: 17.8719
   type: 'suite'
   ...
-1..6
-# tests 25
-# suites 6
-# pass 25
+1..7
+# tests 28
+# suites 7
+# pass 28
 # fail 0
 # cancelled 0
 # skipped 0
 # todo 0
-# duration_ms 9204.4146
+# duration_ms 9436.8052

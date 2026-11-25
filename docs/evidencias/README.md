@@ -9,8 +9,8 @@
 
 | Archivo | Contenido | Resultado Real |
 |---|---|---|
-| [backend-tests.txt](backend-tests.txt) | Salida íntegra de `npm --prefix backend test` (`node --test`: suites unitarias de bcrypt, AES-256-GCM, SHA-256, TOTP, Zod fail-closed y suite HTTP OWASP Top 10:2025). | **25/25 pruebas aprobadas (0 fallos).** |
-| [mysql-integration-check.txt](mysql-integration-check.txt) | Salida real de `npm --prefix backend run test:integration` contra MySQL local (`REQUIRE_MYSQL=true`, 14 verificaciones InnoDB/utf8mb4) y comprobación fail-closed con puerto inaccesible. | **3/3 pruebas reales de integración MySQL aprobadas (0 fallos);** modo fail-closed con `REQUIRE_MYSQL=true` confirmado (`ExitCode=1`). |
+| [backend-tests.txt](backend-tests.txt) | Salida íntegra de `npm --prefix backend test` (`node --test`: suites de TLS MySQL estricto, bcrypt, AES-256-GCM, SHA-256, TOTP, Zod fail-closed y suite HTTP OWASP Top 10:2025). | **28/28 pruebas aprobadas (0 fallos).** |
+| [mysql-integration-check.txt](mysql-integration-check.txt) | Salida real de `npm --prefix backend run test:integration` contra MySQL local (`REQUIRE_MYSQL=true`, 14 verificaciones InnoDB/utf8mb4 + rechazo TLS autofirmado sin CA) y comprobación fail-closed con puerto inaccesible. | **3/3 pruebas reales de integración MySQL aprobadas (0 fallos);** modo fail-closed con `REQUIRE_MYSQL=true` confirmado (`ExitCode=1`). |
 | [frontend-tests-and-build.txt](frontend-tests-and-build.txt) | Salida de `npm --prefix frontend test` (Vitest + React Testing Library) y `npm --prefix frontend run build` (Vite). | **4/4 pruebas aprobadas**; build limpio en `frontend/dist`. |
 | [npm-audit.txt](npm-audit.txt) | Salida real de `npm --prefix backend audit --audit-level=high` y `npm --prefix frontend audit --audit-level=high`. | **0 vulnerabilidades** en backend y frontend. |
 | [gitleaks-scan.txt](gitleaks-scan.txt) | Escaneo completo del historial Git con `gitleaks v8.30.1` y reglas personalizadas en `.gitleaks.toml`. | **0 secretos filtrados (`no leaks found`).** |

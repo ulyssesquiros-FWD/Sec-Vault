@@ -50,6 +50,7 @@
 6. **Corrección en `docker-compose.yml`:** Se eliminó el montaje de migraciones en `/docker-entrypoint-initdb.d` y se añadió el servicio one-shot `migrate` antes de `app`, dejando valores por defecto de desarrollo local reproducibles sin romper el modo producción del `Dockerfile`.
 7. **Limpieza de `package-lock.json` y `npm ci` reproducible:** Se eliminó la referencia espuria `"securevault-monorepo": "file:.."` en `backend/` y `frontend/` y se verificó `npm ci` limpio en ambos subproyectos (0 vulnerabilidades).
 8. **Endurecimiento final para Railway y Gitleaks v8.30.1:** Se deshabilitó `createDatabaseTable` de sesiones en producción (compatible con usuario DML-only `securevault_app`), se añadió soporte opcional de `MIGRATION_DB_USER` para migraciones DDL, se impidió reutilizar `SESSION_SECRET === DATA_ENCRYPTION_KEY` en `env.js`, se exigió contraseña >= 12 caracteres en `seed.js`, y se actualizó CI para ejecutar `gitleaks` CLI `v8.30.1` directamente con `[[allowlists]]` explícitos.
+9. **Diagnóstico y endurecimiento TLS MySQL (`database.js`, `env.js`, `server.js`):** Se documentó la causa exacta de `self-signed certificate in certificate chain` en Railway MySQL (`auto_generate_certs = ON` sin CA pública ni `DB_SSL_CA` configurada), manteniendo `DB_SSL=true` y `rejectUnauthorized: true` obligatorios (cero excepciones inseguras). Se añadió validación temprana de `DB_SSL_CA` contra llaves privadas/PEM inválidos, soporte opcional `DB_SSL_VERIFY_IDENTITY`, verificación de `Ssl_cipher`, clasificación segura de errores (`CONFIGURATION_ERROR`, `TLS_CERTIFICATE_ERROR`, `MYSQL_AUTH_ERROR`, `MYSQL_CONNECTION_ERROR`, `MYSQL_AVAILABILITY_ERROR`) y pruebas TLS reales con `mysql2` + `openssl` (`databaseTls.test.js`).
 
 ---
 
@@ -65,7 +66,7 @@
 
 ## 5. Resultados Verificados y Pendientes Honestos
 
-- **Backend unitario y HTTP OWASP (`npm --prefix backend test`):** **25/25 pruebas aprobadas (0 fallos)**.
+- **Backend unitario, TLS estricto y HTTP OWASP (`npm --prefix backend test`):** **28/28 pruebas aprobadas (0 fallos)**.
 - **Integración MySQL real (`backend/tests/integration/mysql.integration.test.js`):** Ejecutada y aprobada localmente contra MySQL `InnoDB`/`utf8mb4` (**3/3 subtests cubriendo las 14 verificaciones reales, 0 fallos**), verificada en modo fail-closed (`REQUIRE_MYSQL=true` falla si MySQL no responde) y configurada en `.github/workflows/ci.yml` contra `mysql:8.4`.
 - **Frontend (`npm --prefix frontend test` y `build`):** **4/4 pruebas aprobadas** y build Vite limpio.
 - **Auditoría de dependencias (`npm audit`):** **0 vulnerabilidades** en backend y **0 vulnerabilidades** en frontend.

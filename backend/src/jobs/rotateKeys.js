@@ -2,7 +2,7 @@ import path from 'node:path';
 import { fileURLToPath } from 'node:url';
 import { loadConfig } from '../config/env.js';
 import { createLogger } from '../config/logger.js';
-import { createPool } from '../config/database.js';
+import { createPool, classifyDatabaseError } from '../config/database.js';
 import { createEncryptionService } from '../services/encryptionService.js';
 import { createUserRepository } from '../repositories/userRepository.js';
 import { createNoteRepository } from '../repositories/noteRepository.js';
@@ -102,7 +102,11 @@ if (isMain) {
   rotateAllKeys()
     .then(() => process.exit(0))
     .catch((err) => {
-      console.error('Error durante rotación de llaves:', err.message);
+      const classified = classifyDatabaseError(err);
+      console.error(
+        `Error durante rotación de llaves [${classified.label} | ${classified.code}]: ${classified.message}`
+      );
+      console.error(`Acción sugerida: ${classified.guidance}`);
       process.exit(1);
     });
 }

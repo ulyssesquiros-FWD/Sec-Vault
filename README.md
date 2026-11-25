@@ -140,10 +140,10 @@ El servicio `mysql` (`mysql:8.4`) escucha únicamente en `127.0.0.1:3306` dentro
 
 ## 5. Pruebas Automatizadas y Auditoría
 
-**Estado verificado localmente tras la última actualización:** `25/25` pruebas backend (unitarias y HTTP OWASP), `3/3` pruebas reales de integración MySQL (`14` verificaciones), `4/4` pruebas frontend + build limpio en `frontend/dist`, `0` secretos en historial (`gitleaks v8.30.1`) y `0` vulnerabilidades en `npm audit`.
+**Estado verificado localmente tras la última actualización:** `28/28` pruebas backend (unitarias, TLS estricto MySQL y HTTP OWASP), `3/3` pruebas reales de integración MySQL (`14` verificaciones + rechazo TLS sin CA), `4/4` pruebas frontend + build limpio en `frontend/dist`, `0` secretos en historial (`gitleaks v8.30.1`) y `0` vulnerabilidades en `npm audit`.
 
 ```bash
-# Pruebas unitarias y suite HTTP de seguridad OWASP Top 10:2025 (backend: 25/25 aprobadas)
+# Pruebas unitarias, validación TLS MySQL y suite HTTP OWASP Top 10:2025 (backend: 28/28 aprobadas)
 npm run test:backend
 
 # Pruebas reales de integración contra MySQL 8.4/9.x (requiere MySQL activo y TEST_DB_*: 3/3 suites, 14 checks aprobados)
