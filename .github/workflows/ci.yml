@@ -11,7 +11,7 @@ permissions:
 
 jobs:
   secret-scan:
-    name: Escaneo de Secretos (Gitleaks)
+    name: 1. Secret Scan (Gitleaks)
     runs-on: ubuntu-latest
     steps:
       - name: Checkout completo del repositorio
@@ -19,24 +19,48 @@ jobs:
         with:
           fetch-depth: 0
 
-      - name: Ejecutar Gitleaks sobre historial completo
+      - name: Ejecutar Gitleaks sobre todo el historial Git
         uses: gitleaks/gitleaks-action@v2
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
-  backend-tests-and-audit:
-    name: Backend Tests, MySQL 8.4 Integration & npm audit
+  backend-tests:
+    name: 2. Backend Unit & OWASP HTTP Tests
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout del código
+        uses: actions/checkout@v4
+
+      - name: Configurar Node.js 22 LTS
+        uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: npm
+          cache-dependency-path: backend/package-lock.json
+
+      - name: Instalar dependencias reproducibles (npm ci)
+        working-directory: backend
+        run: npm ci
+
+      - name: Ejecutar pruebas unitarias y de seguridad OWASP
+        working-directory: backend
+        run: npm test
+
+  mysql-integration-tests:
+    name: 3. MySQL 8.4 Integration Tests
     runs-on: ubuntu-latest
     services:
       mysql:
         image: mysql:8.4
         env:
-          MYSQL_ROOT_PASSWORD: ci_ephemeral_root_password_987
+          MYSQL_ROOT_PASSWORD: ci_ephemeral_root_pw_84 # gitleaks:allow
           MYSQL_DATABASE: securevault_test
+          MYSQL_USER: securevault_test
+          MYSQL_PASSWORD: ci_ephemeral_app_pw_84 # gitleaks:allow
         ports:
           - 3306:3306
         options: >-
-          --health-cmd="mysqladmin ping -h 127.0.0.1 -pci_ephemeral_root_password_987"
+          --health-cmd="mysqladmin ping -h 127.0.0.1 -u root -pci_ephemeral_root_pw_84"
           --health-interval=10s
           --health-timeout=5s
           --health-retries=10
@@ -52,32 +76,62 @@ jobs:
           cache: npm
           cache-dependency-path: backend/package-lock.json
 
-      - name: Instalar dependencias del backend con npm ci
+      - name: Instalar dependencias reproducibles (npm ci)
         working-directory: backend
         run: npm ci
 
-      - name: Ejecutar pruebas unitarias y de seguridad HTTP OWASP
+      - name: Ejecutar migraciones SQL versionadas sobre MySQL 8.4
         working-directory: backend
-        run: npm test
+        env:
+          NODE_ENV: test
+          DB_HOST: 127.0.0.1
+          DB_PORT: 3306
+          DB_NAME: securevault_test
+          DB_USER: securevault_test
+          DB_PASSWORD: ci_ephemeral_app_pw_84 # gitleaks:allow
+          DB_SSL: 'false'
+          SESSION_SECRET: ci_ephemeral_session_secret_32_characters_long # gitleaks:allow
+          DATA_ENCRYPTION_KEY: 0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef # gitleaks:allow
+        run: npm run db:migrate
 
-      - name: Ejecutar pruebas reales de integración con MySQL 8.4
+      - name: Ejecutar suite completa de integración MySQL real (falla si MySQL no responde)
         working-directory: backend
         env:
           REQUIRE_MYSQL: 'true'
           TEST_DB_HOST: 127.0.0.1
           TEST_DB_PORT: 3306
           TEST_DB_NAME: securevault_test
-          TEST_DB_USER: root
-          TEST_DB_PASSWORD: ci_ephemeral_root_password_987
+          TEST_DB_USER: securevault_test
+          TEST_DB_PASSWORD: ci_ephemeral_app_pw_84 # gitleaks:allow
           TEST_DB_SSL: 'false'
         run: npm run test:integration
 
-      - name: Auditoría de dependencias backend (bloquea si hay High/Critical)
-        working-directory: backend
-        run: npm audit --audit-level=high
+  npm-audit:
+    name: 4. Dependency Security Audit (npm audit)
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout del código
+        uses: actions/checkout@v4
 
-  frontend-tests-and-build:
-    name: Frontend Tests, Vite Build & npm audit
+      - name: Configurar Node.js 22 LTS
+        uses: actions/setup-node@v4
+        with:
+          node-version: 22
+
+      - name: Instalar y auditar backend (bloquea si hay High/Critical)
+        working-directory: backend
+        run: |
+          npm ci
+          npm audit --audit-level=high
+
+      - name: Instalar y auditar frontend (bloquea si hay High/Critical)
+        working-directory: frontend
+        run: |
+          npm ci
+          npm audit --audit-level=high
+
+  frontend-tests:
+    name: 5. Frontend React Tests
     runs-on: ubuntu-latest
     steps:
       - name: Checkout del código
@@ -90,25 +144,45 @@ jobs:
           cache: npm
           cache-dependency-path: frontend/package-lock.json
 
-      - name: Instalar dependencias del frontend con npm ci
+      - name: Instalar dependencias reproducibles (npm ci)
         working-directory: frontend
         run: npm ci
 
-      - name: Ejecutar pruebas de componentes React y anti-XSS
+      - name: Ejecutar pruebas Vitest y anti-XSS
         working-directory: frontend
         run: npm test
 
-      - name: Compilar bundle de producción con Vite
+  frontend-build:
+    name: 6. Frontend Production Build (Vite)
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout del código
+        uses: actions/checkout@v4
+
+      - name: Configurar Node.js 22 LTS
+        uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: npm
+          cache-dependency-path: frontend/package-lock.json
+
+      - name: Instalar dependencias reproducibles (npm ci)
+        working-directory: frontend
+        run: npm ci
+
+      - name: Compilar artefacto de producción Vite
         working-directory: frontend
         run: npm run build
 
-      - name: Auditoría de dependencias frontend (bloquea si hay High/Critical)
-        working-directory: frontend
-        run: npm audit --audit-level=high
-
   deploy:
-    name: Despliegue Condicionado a Verificaciones
-    needs: [secret-scan, backend-tests-and-audit, frontend-tests-and-build]
+    name: 7. Despliegue Condicionado a Todas las Verificaciones
+    needs:
+      - secret-scan
+      - backend-tests
+      - mysql-integration-tests
+      - npm-audit
+      - frontend-tests
+      - frontend-build
     if: github.event_name == 'push' && github.ref == 'refs/heads/main'
     runs-on: ubuntu-latest
     steps:
@@ -121,4 +195,4 @@ jobs:
             exit 0
           fi
           curl -fsS -X POST "$DEPLOY_HOOK_URL"
-          echo "Despliegue disparado correctamente tras aprobar todas las verificaciones."
+          echo "Despliegue disparado correctamente tras aprobar los 6 trabajos de verificación."
