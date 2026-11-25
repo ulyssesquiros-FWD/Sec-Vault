@@ -1,4 +1,5 @@
 import { destroySession, isSessionExpired } from '../services/sessionService.js';
+import { getClearCookieOptions } from '../config/session.js';
 import { unauthorized } from '../utils/errors.js';
 
 /**
@@ -6,6 +7,8 @@ import { unauthorized } from '../utils/errors.js';
  * Valida expiración por inactividad, duración máxima absoluta y `session_version`.
  */
 export function createAuthenticateUser({ userRepository, config }) {
+  const clearCookieOpts = getClearCookieOptions(config);
+
   return async function authenticateUser(req, res, next) {
     try {
       if (!req.session) {
@@ -21,14 +24,14 @@ export function createAuthenticateUser({ userRepository, config }) {
 
       if (isSessionExpired(req.session, config.session)) {
         await destroySession(req).catch(() => {});
-        res.clearCookie('secvault.sid', { path: '/' });
+        res.clearCookie('secvault.sid', clearCookieOpts);
         return next(unauthorized('Tu sesión ha expirado. Inicia sesión nuevamente.', 'SESSION_EXPIRED'));
       }
 
       const user = await userRepository.findById(req.session.userId);
       if (!user || Number(user.session_version) !== Number(req.session.sessionVersion)) {
         await destroySession(req).catch(() => {});
-        res.clearCookie('secvault.sid', { path: '/' });
+        res.clearCookie('secvault.sid', clearCookieOpts);
         return next(unauthorized('Sesión invalidada. Inicia sesión nuevamente.', 'SESSION_REVOKED'));
       }
 

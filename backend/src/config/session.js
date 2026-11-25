@@ -50,3 +50,16 @@ export function createSessionMiddleware(config, store) {
     }
   });
 }
+
+/**
+ * Opciones consistentes para limpiar la cookie de sesión en logout/expiración/revocación.
+ * @param {ReturnType<import('./env.js').loadConfig>} config
+ */
+export function getClearCookieOptions(config) {
+  return {
+    path: '/',
+    httpOnly: true,
+    secure: config.isProduction,
+    sameSite: config.session.sameSite
+  };
+}

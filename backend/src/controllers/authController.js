@@ -5,6 +5,7 @@ import {
   destroySession
 } from '../services/sessionService.js';
 import { verifyTotpCode, consumeRecoveryCode } from '../services/totpService.js';
+import { getClearCookieOptions } from '../config/session.js';
 import { extractClientIp } from '../utils/sanitize.js';
 import { unauthorized, tooManyRequests } from '../utils/errors.js';
 
@@ -268,7 +269,7 @@ export function createAuthController({
       const ip = extractClientIp(req);
 
       await destroySession(req);
-      res.clearCookie('secvault.sid', { path: '/' });
+      res.clearCookie('secvault.sid', getClearCookieOptions(config));
 
       if (actorId) {
         await auditService.recordEvent({

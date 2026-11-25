@@ -43,6 +43,15 @@ export function createSecurityMiddlewares(config) {
     next();
   };
 
+  /**
+   * Impide que navegadores o proxies intermedios almacenen en caché notas descifradas o datos de perfil.
+   */
+  const noStoreApiCacheMiddleware = (req, res, next) => {
+    res.setHeader('Cache-Control', 'no-store, no-cache, must-revalidate, private');
+    res.setHeader('Pragma', 'no-cache');
+    next();
+  };
+
   const allowedOrigins = new Set([config.appUrl, config.allowedOrigin]);
   const corsMiddleware = cors({
     origin(origin, callback) {
@@ -63,6 +72,7 @@ export function createSecurityMiddlewares(config) {
   return {
     helmetMiddleware,
     permissionsPolicyMiddleware,
+    noStoreApiCacheMiddleware,
     corsMiddleware
   };
 }

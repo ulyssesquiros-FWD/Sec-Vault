@@ -1,6 +1,7 @@
 import { hashPassword } from '../services/passwordService.js';
 import { generateSecureToken, hashToken } from '../services/tokenService.js';
 import { destroySession } from '../services/sessionService.js';
+import { getClearCookieOptions } from '../config/session.js';
 import { extractClientIp } from '../utils/sanitize.js';
 
 const RESET_EXPIRATION_MS = 30 * 60 * 1000;
@@ -77,7 +78,7 @@ export function createPasswordController({
 
       if (req.session) {
         await destroySession(req).catch(() => {});
-        res.clearCookie('secvault.sid', { path: '/' });
+        res.clearCookie('secvault.sid', getClearCookieOptions(config));
       }
 
       return res.status(200).json({

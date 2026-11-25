@@ -54,7 +54,12 @@ export function createApp({
   app.disable('x-powered-by');
   app.set('trust proxy', config.trustProxy);
 
-  const { helmetMiddleware, permissionsPolicyMiddleware, corsMiddleware } = createSecurityMiddlewares(config);
+  const {
+    helmetMiddleware,
+    permissionsPolicyMiddleware,
+    noStoreApiCacheMiddleware,
+    corsMiddleware
+  } = createSecurityMiddlewares(config);
   app.use(helmetMiddleware);
   app.use(permissionsPolicyMiddleware);
   app.use(corsMiddleware);
@@ -124,8 +129,9 @@ export function createApp({
   // Endpoint de salud sin exposición de datos sensibles ni limitador agresivo
   app.use('/', createHealthRoutes());
 
+  app.use('/api', noStoreApiCacheMiddleware);
   app.use('/api', rateLimiters.globalLimiter);
-  app.use(sessionMiddleware);
+  app.use('/api', sessionMiddleware);
 
   app.use(
     '/api/auth',
@@ -181,6 +187,7 @@ export function createApp({
       if (req.method !== 'GET' || req.path.startsWith('/api/') || req.path === '/health') {
         return next();
       }
+      res.setHeader('Cache-Control', 'no-cache');
       return res.sendFile(path.join(frontendDistPath, 'index.html'));
     });
   }

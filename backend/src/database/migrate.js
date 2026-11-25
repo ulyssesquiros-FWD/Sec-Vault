@@ -4,6 +4,7 @@ import { fileURLToPath } from 'node:url';
 import mysql from 'mysql2/promise';
 import { loadConfig } from '../config/env.js';
 import { createLogger } from '../config/logger.js';
+import { buildSslOptions } from '../config/database.js';
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
@@ -16,13 +17,7 @@ export async function runMigrations(configInput = null) {
   const config = configInput || loadConfig();
   const logger = createLogger(config);
 
-  const ssl = config.db.ssl
-    ? {
-        rejectUnauthorized: true,
-        minVersion: 'TLSv1.2',
-        ...(config.db.sslCa ? { ca: config.db.sslCa } : {})
-      }
-    : undefined;
+  const ssl = buildSslOptions(config.db);
 
   const conn = await mysql.createConnection({
     host: config.db.host,

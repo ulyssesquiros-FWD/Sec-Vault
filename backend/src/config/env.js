@@ -90,7 +90,7 @@ const rawEnvSchema = z.object({
   PORT: z.coerce.number().int().min(1).max(65535).default(4000),
   TRUST_PROXY: z.string().optional(),
   APP_URL: z.string().url().default('http://localhost:5173'),
-  ALLOWED_ORIGIN: z.string().url().optional(),
+  ALLOWED_ORIGIN: z.preprocess((val) => (val === '' ? undefined : val), z.string().url().optional()),
 
   DB_HOST: z.string().min(1).default('127.0.0.1'),
   DB_PORT: z.coerce.number().int().min(1).max(65535).default(3306),

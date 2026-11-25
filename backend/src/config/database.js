@@ -4,9 +4,10 @@ import mysql from 'mysql2/promise';
 /**
  * Construye las opciones SSL seguras para MySQL.
  * En producción siempre exige verificación estricta del certificado (`rejectUnauthorized: true`).
+ * Soporta PEM directo, PEM con `\n` escapados, Base64 de PEM o ruta de archivo.
  * @param {{ ssl: boolean, sslCa?: string }} dbConfig
  */
-function buildSslOptions(dbConfig) {
+export function buildSslOptions(dbConfig) {
   if (!dbConfig.ssl) {
     return undefined;
   }
@@ -23,7 +24,14 @@ function buildSslOptions(dbConfig) {
     } else if (fs.existsSync(trimmed)) {
       sslOptions.ca = fs.readFileSync(trimmed, 'utf8');
     } else {
-      throw new Error('DB_SSL_CA especificado no contiene un certificado válido ni apunta a un archivo existente.');
+      const decoded = Buffer.from(trimmed, 'base64').toString('utf8');
+      if (decoded.includes('BEGIN CERTIFICATE')) {
+        sslOptions.ca = decoded;
+      } else {
+        throw new Error(
+          'DB_SSL_CA especificado no contiene un certificado PEM válido (directo o Base64) ni apunta a un archivo existente.'
+        );
+      }
     }
   }
 

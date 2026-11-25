@@ -7,10 +7,10 @@ import { AppError } from '../utils/errors.js';
 export function createPasswordResetRepository(pool) {
   async function createResetToken({ userId, tokenHash, expiresAt }) {
     return withTransaction(pool, async (conn) => {
-      // Invalidar cualquier token activo previo del mismo usuario
+      // Invalidar cualquier token activo previo del mismo usuario usando reloj UTC consistente
       await conn.execute(
         `UPDATE password_resets
-         SET used_at = NOW()
+         SET used_at = UTC_TIMESTAMP()
          WHERE user_id = ? AND used_at IS NULL`,
         [Number(userId)]
       );
@@ -26,7 +26,7 @@ export function createPasswordResetRepository(pool) {
   async function consumeTokenAndResetPassword({ tokenHash, newPasswordHash, ipAddress }) {
     return withTransaction(pool, async (conn) => {
       const [rows] = await conn.execute(
-        `SELECT id, user_id, expires_at, used_at
+        `SELECT id, user_id, expires_at, used_at, (expires_at <= UTC_TIMESTAMP()) AS is_expired
          FROM password_resets
          WHERE token_hash = ?
          LIMIT 1
@@ -43,17 +43,17 @@ export function createPasswordResetRepository(pool) {
         throw new AppError('Este enlace de recuperación ya fue utilizado.', 400, 'RESET_TOKEN_ALREADY_USED');
       }
 
-      if (new Date(record.expires_at).getTime() <= Date.now()) {
+      if (Boolean(record.is_expired) || new Date(record.expires_at).getTime() <= Date.now()) {
         throw new AppError('El token de recuperación ha expirado.', 400, 'RESET_TOKEN_EXPIRED');
       }
 
       await conn.execute(
-        'UPDATE password_resets SET used_at = NOW() WHERE id = ?',
+        'UPDATE password_resets SET used_at = UTC_TIMESTAMP() WHERE id = ?',
         [Number(record.id)]
       );
 
       await conn.execute(
-        'UPDATE password_resets SET used_at = NOW() WHERE user_id = ? AND used_at IS NULL',
+        'UPDATE password_resets SET used_at = UTC_TIMESTAMP() WHERE user_id = ? AND used_at IS NULL',
         [Number(record.user_id)]
       );
 

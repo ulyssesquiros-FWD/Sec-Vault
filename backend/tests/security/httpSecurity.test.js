@@ -188,7 +188,7 @@ describe('Suite HTTP de Seguridad OWASP Top 10:2025 & Requisitos Funcionales', (
     assert.ok(['SESSION_EXPIRED', 'UNAUTHENTICATED'].includes(res.body.code));
   });
 
-  it('RF-04, RF-03 & A01/A05/A06: CRUD de notas cifradas, perfil enmascarado, XSS e IDOR entre usuarios', async () => {
+  it('RF-04, RF-05 & A01/A05/A06: CRUD de notas cifradas, perfil enmascarado, XSS, no-store e IDOR entre usuarios', async () => {
     const { app, inMemory } = buildTestContext();
     const agentA = request.agent(app);
     const agentB = request.agent(app);
@@ -209,9 +209,10 @@ describe('Suite HTTP de Seguridad OWASP Top 10:2025 & Requisitos Funcionales', (
     });
     assert.equal(regB.status, 201);
 
-    // Teléfono enmascarado por defecto + revelado autorizado
+    // Teléfono enmascarado por defecto (RF-05) + cabecera Cache-Control no-store + revelado autorizado
     const profileRes = await agentA.get('/api/users/me');
     assert.equal(profileRes.status, 200);
+    assert.ok(String(profileRes.headers['cache-control']).includes('no-store'));
     assert.equal(profileRes.body.profile.maskedPhone, '***-***-3456');
 
     const badReveal = await agentA
@@ -291,7 +292,7 @@ describe('Suite HTTP de Seguridad OWASP Top 10:2025 & Requisitos Funcionales', (
     assert.equal(overLimit.body.code, 'NOTE_LIMIT_REACHED');
   });
 
-  it('RF-05, RF-07 & A01/A05: RBAC estricto, auditoría, SQLi y prevención de auto-cambio de rol', async () => {
+  it('RF-03, RF-07 & A01/A05: RBAC estricto, auditoría, SQLi y prevención de auto-cambio de rol', async () => {
     const { app, config, inMemory } = buildTestContext();
     await seedAdmin(inMemory, config);
 
