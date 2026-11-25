@@ -1,7 +1,7 @@
 # ==============================================================================
 # Stage 1: Build Frontend React + Vite
 # ==============================================================================
-FROM node:22-alpine AS frontend-builder
+FROM node:26-alpine AS frontend-builder
 WORKDIR /app/frontend
 
 COPY frontend/package*.json ./
@@ -13,7 +13,7 @@ RUN npm run build
 # ==============================================================================
 # Stage 2: Instalar dependencias de producción del Backend
 # ==============================================================================
-FROM node:22-alpine AS backend-deps
+FROM node:26-alpine AS backend-deps
 WORKDIR /app/backend
 
 RUN apk add --no-cache python3 make g++
@@ -24,7 +24,7 @@ RUN npm ci --omit=dev
 # ==============================================================================
 # Stage 3: Runtime mínimo no-root
 # ==============================================================================
-FROM node:22-alpine AS runtime
+FROM node:26-alpine AS runtime
 WORKDIR /app/backend
 
 ENV NODE_ENV=production
