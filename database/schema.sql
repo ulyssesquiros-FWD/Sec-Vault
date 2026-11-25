@@ -107,3 +107,11 @@ CREATE TABLE IF NOT EXISTS sessions (
   PRIMARY KEY (session_id),
   KEY idx_sessions_expires (expires)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_bin;
+
+-- Registrar migraciones consolidadas en el historial para compatibilidad con `npm run db:migrate`
+INSERT INTO schema_migrations (version, applied_at)
+VALUES 
+  ('001_initial_schema.sql', CURRENT_TIMESTAMP),
+  ('002_mfa_support.sql', CURRENT_TIMESTAMP)
+ON DUPLICATE KEY UPDATE applied_at = CURRENT_TIMESTAMP;
+

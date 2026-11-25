@@ -52,7 +52,16 @@ export async function runMigrations(configInput = null) {
         continue;
       }
       const sql = await fs.readFile(path.join(MIGRATIONS_DIR, file), 'utf8');
-      await conn.query(sql);
+      try {
+        await conn.query(sql);
+      } catch (sqlErr) {
+        // Si las columnas o índices ya existían (ej. por esquema consolidado previo), continuar y registrar versión
+        if (sqlErr.errno === 1060 || sqlErr.code === 'ER_DUP_FIELDNAME') {
+          logger.warn({ migration: file, warning: sqlErr.message }, 'Columnas ya existentes en tabla; registrando versión en schema_migrations');
+        } else {
+          throw sqlErr;
+        }
+      }
       await conn.execute('INSERT INTO schema_migrations (version) VALUES (?)', [file]);
       executed.push(file);
       logger.info({ migration: file }, 'Migración MySQL aplicada correctamente');
