@@ -1,0 +1,27 @@
+{
+  "name": "securevault-monorepo",
+  "version": "1.0.0",
+  "private": true,
+  "description": "SecureVault — Sistema Full Stack seguro con Node.js, Express.js, React, MySQL, bcrypt, AES-256-GCM y OWASP Top 10:2025 (Proyecto Individual)",
+  "author": "Josué",
+  "license": "MIT",
+  "engines": {
+    "node": ">=22.0.0",
+    "npm": ">=10.0.0"
+  },
+  "scripts": {
+    "install:all": "npm --prefix backend install && npm --prefix frontend install",
+    "dev:backend": "npm --prefix backend run dev",
+    "dev:frontend": "npm --prefix frontend run dev",
+    "build": "npm --prefix frontend run build",
+    "start": "npm --prefix backend start",
+    "test": "npm --prefix backend test && npm --prefix frontend test",
+    "test:backend": "npm --prefix backend test",
+    "test:frontend": "npm --prefix frontend test",
+    "test:integration": "npm --prefix backend run test:integration",
+    "db:migrate": "npm --prefix backend run db:migrate",
+    "db:seed": "npm --prefix backend run db:seed",
+    "crypto:rotate": "npm --prefix backend run crypto:rotate",
+    "audit": "npm --prefix backend audit --audit-level=high && npm --prefix frontend audit --audit-level=high"
+  }
+}
