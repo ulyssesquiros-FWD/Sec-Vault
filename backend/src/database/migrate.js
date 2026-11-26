@@ -49,13 +49,21 @@ export async function runMigrations(configInput = null) {
       }
     }
 
-    await conn.execute(`
-      CREATE TABLE IF NOT EXISTS schema_migrations (
-        version VARCHAR(64) NOT NULL,
-        applied_at DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
-        PRIMARY KEY (version)
-      ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
-    `);
+    const [tableRows] = await conn.execute(
+      `SELECT COUNT(*) AS tableCount
+       FROM information_schema.TABLES
+       WHERE TABLE_SCHEMA = DATABASE()
+         AND TABLE_NAME = 'schema_migrations'`
+    );
+    if (Number(tableRows[0]?.tableCount || 0) === 0) {
+      await conn.execute(`
+        CREATE TABLE IF NOT EXISTS schema_migrations (
+          version VARCHAR(64) NOT NULL,
+          applied_at DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
+          PRIMARY KEY (version)
+        ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+      `);
+    }
 
     const [appliedRows] = await conn.execute('SELECT version FROM schema_migrations');
     const appliedSet = new Set(appliedRows.map((row) => row.version));
@@ -63,6 +71,10 @@ export async function runMigrations(configInput = null) {
     const files = (await fs.readdir(MIGRATIONS_DIR))
       .filter((file) => file.endsWith('.sql'))
       .sort();
+
+    if (files.every((file) => appliedSet.has(file))) {
+      return [];
+    }
 
     const executed = [];
     for (const file of files) {

@@ -293,6 +293,13 @@ describe('Seguridad TLS MySQL (buildSslOptions, classifyDatabaseError y handshak
     });
     assert.equal(availErr.category, 'MYSQL_AVAILABILITY_ERROR');
 
+    const missingTableErr = classifyDatabaseError({
+      code: 'ER_NO_SUCH_TABLE',
+      message: "Table 'railway.users' doesn't exist"
+    });
+    assert.equal(missingTableErr.category, 'MYSQL_AVAILABILITY_ERROR');
+    assert.match(missingTableErr.guidance, /db:migrate/);
+
     const scrubbedPem = sanitizeDatabaseErrorMessage(
       'Fallo con -----BEGIN PRIVATE KEY-----\nABC\n-----END PRIVATE KEY-----'
     );

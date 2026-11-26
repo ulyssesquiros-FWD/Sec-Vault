@@ -3,6 +3,7 @@ import { createLogger } from './config/logger.js';
 import {
   createPool,
   checkDatabaseHealth,
+  checkRequiredTables,
   getDatabaseTlsStatus,
   classifyDatabaseError
 } from './config/database.js';
@@ -19,6 +20,7 @@ async function startServer() {
 
   pool = createPool(config, logger);
   await checkDatabaseHealth(pool, { requireTls: config.db.ssl });
+  await checkRequiredTables(pool);
   const tlsStatus = config.db.ssl ? await getDatabaseTlsStatus(pool) : { tlsActive: false, cipher: null, version: null };
   logger.info(
     {

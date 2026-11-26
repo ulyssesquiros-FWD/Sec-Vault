@@ -7,6 +7,7 @@ import { createLogger } from '../../src/config/logger.js';
 import {
   createPool,
   checkDatabaseHealth,
+  checkRequiredTables,
   withTransaction,
   classifyDatabaseError
 } from '../../src/config/database.js';
@@ -102,6 +103,7 @@ describe(
 
     it('1-2: Verifica conexión mysql2, concurrencia del pool, InnoDB y utf8mb4 en las 7 tablas', async () => {
       assert.equal(await checkDatabaseHealth(pool), true);
+      assert.equal(await checkRequiredTables(pool), true);
 
       const concurrentResults = await Promise.all(
         Array.from({ length: 10 }, () => pool.execute('SELECT 1 AS ok'))

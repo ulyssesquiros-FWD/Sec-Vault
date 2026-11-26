@@ -150,6 +150,17 @@ export function classifyDatabaseError(err) {
     };
   }
 
+  if (code === 'ER_NO_SUCH_TABLE' || lower.includes("doesn't exist") || lower.includes('faltan tablas')) {
+    return {
+      category: 'MYSQL_AVAILABILITY_ERROR',
+      label: 'Error de disponibilidad de MySQL (esquema pendiente)',
+      code: code || 'ER_NO_SUCH_TABLE',
+      message: rawMsg,
+      guidance:
+        'Las tablas de SecureVault aún no existen en DB_NAME. Ejecuta "npm run db:migrate" contra la base de datos de producción antes de iniciar.'
+    };
+  }
+
   return {
     category: 'MYSQL_AVAILABILITY_ERROR',
     label: 'Error de disponibilidad de MySQL',
@@ -305,6 +316,41 @@ export async function checkDatabaseHealth(pool, options = {}) {
   } finally {
     conn.release();
   }
+}
+
+const REQUIRED_RUNTIME_TABLES = [
+  'users',
+  'notes',
+  'password_resets',
+  'security_events',
+  'login_attempts',
+  'sessions'
+];
+
+/**
+ * Verifica que las tablas obligatorias del esquema existan en la base de datos activa
+ * antes de aceptar tráfico HTTP (fail-closed contra despliegues sin migraciones).
+ * @param {import('mysql2/promise').Pool} pool
+ */
+export async function checkRequiredTables(pool) {
+  const placeholders = REQUIRED_RUNTIME_TABLES.map(() => '?').join(', ');
+  const [rows] = await pool.execute(
+    `SELECT TABLE_NAME
+     FROM information_schema.TABLES
+     WHERE TABLE_SCHEMA = DATABASE()
+       AND TABLE_NAME IN (${placeholders})`,
+    REQUIRED_RUNTIME_TABLES
+  );
+  const existing = new Set(rows.map((r) => r.TABLE_NAME));
+  const missing = REQUIRED_RUNTIME_TABLES.filter((table) => !existing.has(table));
+  if (missing.length > 0) {
+    const schemaErr = new Error(
+      `Faltan tablas obligatorias en MySQL (${missing.join(', ')}). Ejecuta "npm run db:migrate" antes de iniciar el servidor.`
+    );
+    schemaErr.code = 'ER_NO_SUCH_TABLE';
+    throw schemaErr;
+  }
+  return true;
 }
 
 /**
